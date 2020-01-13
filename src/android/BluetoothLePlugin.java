@@ -93,6 +93,7 @@ public class BluetoothLePlugin extends CordovaPlugin {
   private LinkedList<Operation> queue = new LinkedList<Operation>();
 
   //Object keys
+  private final String adapter_name = "adapter_name";
   private final String keyStatus = "status";
   private final String keyError = "error";
   private final String keyMessage = "message";
@@ -967,7 +968,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
     Activity activity = cordova.getActivity();
 
     JSONObject obj = getArgsObject(args);
-
     if (obj != null && getStatusReceiver(obj)) {
       //Add a receiver to pick up when Bluetooth state changes
       activity.registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
@@ -977,6 +977,9 @@ public class BluetoothLePlugin extends CordovaPlugin {
     //Get Bluetooth adapter via Bluetooth Manager
     BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
     bluetoothAdapter = bluetoothManager.getAdapter();
+
+    //set adapter name
+    bluetoothAdapter.setName(getAdapterName(obj));
 
     connections = new HashMap<Object, HashMap<Object, Object>>();
 
@@ -3636,6 +3639,10 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   private boolean getStatusReceiver(JSONObject obj) {
     return obj.optBoolean(keyStatusReceiver, true);
+  }
+
+  private String getAdapterName(JSONObject obj) {
+    return obj.optString(adapter_name, bluetoothAdapter.getName());
   }
 
   private int getWriteType(JSONObject obj) {
