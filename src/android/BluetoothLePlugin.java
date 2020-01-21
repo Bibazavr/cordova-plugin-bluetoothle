@@ -439,6 +439,8 @@ public class BluetoothLePlugin extends CordovaPlugin {
       return;
     }
 
+    JSONObject obj = getArgsObject(args);
+
     initPeripheralCallback = callbackContext;
 
     //Re-opening Gatt server seems to cause some issues
@@ -446,6 +448,11 @@ public class BluetoothLePlugin extends CordovaPlugin {
       Activity activity = cordova.getActivity();
       BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
       gattServer = bluetoothManager.openGattServer(activity.getApplicationContext(), bluetoothGattServerCallback);
+      //when start activity "ACTION_REQUEST_ENABLE" (see 1009 srt) for Bluetooth initializeAction, need do it else
+      // android set default adapter name
+      bluetoothAdapter = bluetoothManager.getAdapter();
+      //set adapter name
+      bluetoothAdapter.setName(getAdapterName(obj));
     }
 
     JSONObject returnObj = new JSONObject();
