@@ -141,6 +141,9 @@ var bluetoothle = {
   notify: function(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, bluetoothleName, "notify", [params]);
   },
+  backgroundService: function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, bluetoothleName, "backgroundService")
+  },
   encodedStringToBytes: function(string) {
     var data = atob(string);
     var bytes = new Uint8Array(data.length);

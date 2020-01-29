@@ -18,13 +18,21 @@
         <param name="android-package" value="com.randdusing.bluetoothle.BluetoothLePlugin" />
       </feature>
     </config-file>
-    <source-file src="src/android/BluetoothLePlugin.java" target-dir="src/com/randdusing/bluetoothle" />
-    <source-file src="src/android/Operation.java" target-dir="src/com/randdusing/bluetoothle" />
+    <source-file src="src/android/com/randdusing/bluetoothle/BluetoothLePlugin.java" target-dir="src/com/randdusing/bluetoothle" />
+    <source-file src="src/android/com/randdusing/bluetoothle/Operation.java" target-dir="src/com/randdusing/bluetoothle" />
+    <source-file src="src/android/com/randdusing/bluetoothle/Background.java" target-dir="src/com/randdusing/bluetoothle" />
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <service android:enabled="true" android:exported="true" android:name="com.randdusing.bluetoothle.Background"/>
+    </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>
       <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
       <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+      <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     </config-file>
+
+    <framework src="androidx.appcompat:appcompat:1.1.0" />
   </platform>
   <platform name="ios">
     <config-file target="config.xml" parent="/*">

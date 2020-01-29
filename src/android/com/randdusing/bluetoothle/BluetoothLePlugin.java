@@ -421,10 +421,27 @@ public class BluetoothLePlugin extends CordovaPlugin {
       respondAction(args, callbackContext);
     } else if ("notify".equals(action)) {
       notifyAction(args, callbackContext);
+    } else if ("backgroundService".equals(action)) {
+      backgroundServiceAction(args, callbackContext);
     } else {
       return false;
     }
     return true;
+  }
+
+  public static CallbackContext callbackContextService;
+
+  private void backgroundServiceAction(JSONArray args, CallbackContext callbackContext) {
+
+    callbackContextService = callbackContext;
+    Context context = cordova.getActivity().getApplicationContext();
+    Intent intent = new Intent(context, Background.class);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent);
+    } else {
+      context.startService(intent);
+    }
+    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
   }
 
   private void initializePeripheralAction(JSONArray args, CallbackContext callbackContext) {
