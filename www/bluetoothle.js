@@ -1,7 +1,7 @@
 var bluetoothleName = "BluetoothLePlugin";
 var bluetoothle = {
-  initialize: function(successCallback, params) {
-    cordova.exec(successCallback, successCallback, bluetoothleName, "initialize", [params]);
+  initialize: function(successCallback, errorCallback, params) {
+    cordova.exec(successCallback, errorCallback, bluetoothleName, "initialize", [params]);
   },
   enable: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, bluetoothleName, "enable", []);
@@ -114,9 +114,6 @@ var bluetoothle = {
   requestLocation: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, bluetoothleName, "requestLocation", []);
   },
-  initializePeripheral: function(successCallback, errorCallback, params) {
-    cordova.exec(successCallback, errorCallback, bluetoothleName, "initializePeripheral", [params]);
-  },
   addService: function(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, bluetoothleName, "addService", [params]);
   },
@@ -140,9 +137,6 @@ var bluetoothle = {
   },
   notify: function(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, bluetoothleName, "notify", [params]);
-  },
-  backgroundService: function(successCallback, errorCallback, params) {
-    cordova.exec(successCallback, errorCallback, bluetoothleName, "backgroundService")
   },
   encodedStringToBytes: function(string) {
     var data = atob(string);
