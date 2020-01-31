@@ -446,21 +446,21 @@ public class Background extends Service {
             Log.e("BIBA", "stringIsAdvertisingAction");
             Log.e(TAG, String.format("%s", callbackContextIsAdvertisingAction));
             isAdvertisingAction(callbackContextIsAdvertisingAction);
-        } else if (stringGetAdapterInfoAction.equals(action)){
+        } else if (stringGetAdapterInfoAction.equals(action)) {
             Log.e("BIBA", "stringGetAdapterInfoAction");
             Log.e(TAG, String.format("%s", callbackContextGetAdapterInfoAction));
             getAdapterInfoAction(callbackContextGetAdapterInfoAction);
-        } else if (stringBondAction.equals(action)){
+        } else if (stringBondAction.equals(action)) {
             Log.e("BIBA", "stringBondAction");
             Log.e(TAG, String.valueOf(argsBondAction));
             Log.e(TAG, String.format("%s", callbackContextBondAction));
             bondAction(argsBondAction, callbackContextBondAction);
-        } else if  (stringUnBondAction.equals(action)){
+        } else if (stringUnBondAction.equals(action)) {
             Log.e("BIBA", "stringUnBondAction");
             Log.e(TAG, String.valueOf(argsUnBondAction));
             Log.e(TAG, String.format("%s", callbackContextUnBondAction));
             unbondAction(argsUnBondAction, callbackContextUnBondAction);
-        } else if (stringIsBondedAction.equals(action)){
+        } else if (stringIsBondedAction.equals(action)) {
             Log.e("BIBA", "stringIsBondedAction");
             Log.e(TAG, String.valueOf(argsIsBondedAction));
             Log.e(TAG, String.format("%s", callbackContextIsBondedAction));
@@ -832,19 +832,18 @@ public class Background extends Service {
         boolean connectable = obj.optBoolean("connectable", true);
         settingsBuilder.setConnectable(connectable);
 
-        int timeout = obj.optInt("timeout", -1);
-        if (timeout != -1) {
-            if (timeout < 0 || timeout > 180000) {
-                JSONObject returnObj = new JSONObject();
+        int timeout = obj.optInt("timeout", 0);
+        if (timeout < 0 || timeout > 180000) {
+            JSONObject returnObj = new JSONObject();
 
-                addProperty(returnObj, "error", "startAdvertising");
-                addProperty(returnObj, "message", "Invalid timeout (0 - 180000)");
+            addProperty(returnObj, "error", "startAdvertising");
+            addProperty(returnObj, "message", "Invalid timeout (0 - 180000)");
 
-                callbackContext.error(returnObj);
-                return;
-            }
-            settingsBuilder.setTimeout(timeout);
+            callbackContext.error(returnObj);
+            return;
         }
+        settingsBuilder.setTimeout(timeout);
+
         String txPowerLevelS = obj.optString("txPowerLevel", "medium");
         int txPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
         if (txPowerLevelS.equals("high")) {
