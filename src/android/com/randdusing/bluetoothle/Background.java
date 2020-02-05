@@ -389,18 +389,18 @@ public class Background extends Service {
             ///--------------------------------
             JSONArray init = null;
             try {
-                init = new JSONArray("{ " +
+                init = new JSONArray("[{ " +
                         "\"request\": \"true\"," +
                         "\"statusReceiver\": \"true\"," +
                         "\"restoreKey\": \"ZONT\"" +
-                        "}");
+                        "}]");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             JSONArray service = null;
             try {
-                service = new JSONArray("{ " +
+                service = new JSONArray("[{ " +
                         "\"service\":\"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +
                         "\"characteristics\": [" +
                         "{" +
@@ -436,17 +436,17 @@ public class Background extends Service {
                         "}" +
                         "}" +
                         "]" +
-                        "}");
+                        "}]");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             JSONArray params_advertising = null;
             try {
-                params_advertising = new JSONArray("{ " +
+                params_advertising = new JSONArray("[{ " +
                         "\"service\": \"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +  //Android
-                        "\"name\": \"ZONT\"," +
-                        "}");
+                        "\"name\": \"ZONT\"" +
+                        "}]");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -488,7 +488,7 @@ public class Background extends Service {
             Log.e("BIBA", "stringStartAdvertisingAction");
             Log.e(TAG, String.valueOf(argsStartAdvertisingAction));
             Log.e(TAG, String.format("%s", callbackContextStartAdvertisingAction));
-            startAdvertisingAction(argsStartAdvertisingAction, callbackContextStartAdvertisingAction);
+            startAdvertisingAction(argsStartAdvertisingAction, isAutoStart, callbackContextStartAdvertisingAction);
         } else if (stringRespondAction.equals(action)) {
             Log.e("BIBA", "stringRespondAction");
             Log.e(TAG, String.valueOf(argsRespondAction));
@@ -693,7 +693,7 @@ public class Background extends Service {
         returnObj = new JSONObject();
 
         //If it's already enabled,
-        if (bluetoothAdapter.isEnabled()) {
+        if (bluetoothAdapter.isEnabled() && !isAutoStart) {
             addProperty(returnObj, keyStatus, statusEnabled);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
             pluginResult.setKeepCallback(true);
@@ -724,7 +724,7 @@ public class Background extends Service {
         //  Инициализацию bluetooth объеденил с initializePeripheralAction
         /// ---------------------------------------------------------------
 
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP && !isAutoStart) {
             returnObj = new JSONObject();
             addProperty(returnObj, "error", "initializePeripheral");
             addProperty(returnObj, "message", logOperationUnsupported);
@@ -738,13 +738,14 @@ public class Background extends Service {
         if (gattServer == null) {
             gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
         }
+        if (!isAutoStart) {
+            returnObj = new JSONObject();
+            addProperty(returnObj, keyStatus, statusEnabled);
 
-        returnObj = new JSONObject();
-        addProperty(returnObj, keyStatus, statusEnabled);
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-        pluginResult.setKeepCallback(true);
-        callbackContextInitializeAction[0].sendPluginResult(pluginResult);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+            pluginResult.setKeepCallback(true);
+            callbackContextInitializeAction[0].sendPluginResult(pluginResult);
+        }
     }
 
     private void addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
@@ -894,7 +895,9 @@ public class Background extends Service {
 
             service.addCharacteristic(characteristic);
         }
-
+        if (isAutoStart) {
+            return;
+        }
         boolean result = gattServer.addService(service);
         if (result) {
             JSONObject returnObj = new JSONObject();
@@ -902,7 +905,7 @@ public class Background extends Service {
             addProperty(returnObj, "service", uuid.toString());
             addProperty(returnObj, "status", "serviceAdded");
 
-            callbackContext.success(returnObj);
+            callbackContext[0].success(returnObj);
         } else {
             JSONObject returnObj = new JSONObject();
 
@@ -910,7 +913,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "service");
             addProperty(returnObj, "message", "Failed to add service");
 
-            callbackContext.error(returnObj);
+            callbackContext[0].error(returnObj);
         }
     }
 
@@ -963,9 +966,9 @@ public class Background extends Service {
         callbackContext.success(returnObj);
     }
 
-    private void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext callbackContext) {
+    private void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
-        if (isNotArgsObject(obj, callbackContext)) {
+        if (!isAutoStart && isNotArgsObject(obj, callbackContext[0])) {
             return;
         }
 //        String name = getAdapterName(obj);
@@ -979,7 +982,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "startAdvertising");
             addProperty(returnObj, "message", "Advertising isn't supported");
 
-            callbackContext.error(returnObj);
+            callbackContext[0].error(returnObj);
             return;
         }
 
@@ -1004,7 +1007,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "startAdvertising");
             addProperty(returnObj, "message", "Invalid timeout (0 - 180000)");
 
-            callbackContext.error(returnObj);
+            callbackContext[0].error(returnObj);
             return;
         }
         settingsBuilder.setTimeout(timeout);
