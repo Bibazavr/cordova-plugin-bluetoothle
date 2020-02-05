@@ -22,7 +22,7 @@
     <source-file src="src/android/com/randdusing/bluetoothle/Operation.java" target-dir="src/com/randdusing/bluetoothle" />
     <source-file src="src/android/com/randdusing/bluetoothle/Background.java" target-dir="src/com/randdusing/bluetoothle" />
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <service android:enabled="true" android:exported="true" android:name="com.randdusing.bluetoothle.Background"/>
+      <service android:name="com.randdusing.bluetoothle.Background"/>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>

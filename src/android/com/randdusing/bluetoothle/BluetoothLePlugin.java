@@ -717,37 +717,40 @@ public class BluetoothLePlugin extends CordovaPlugin {
   }
 
 
-  // ---------------------------------------
-  //  BIBA НЕ нужно мне это пока
-  // ---------------------------------------
+  static CallbackContext callbackContextEnableAction;
+  static final String stringEnableAction = "com.randdusing.bluetoothle.ENABLE";
+
   private void enableAction(CallbackContext callbackContext) {
-    if (isNotInitialized(callbackContext, false)) {
-      return;
+    callbackContextEnableAction = callbackContext;
+
+    Context context = cordova.getActivity().getApplicationContext();
+    Intent intent = new Intent(context, Background.class);
+    intent.setAction(stringEnableAction);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent);
+    } else {
+      context.startService(intent);
     }
-
-    if (isNotDisabled(callbackContext)) {
-      return;
-    }
-
-    boolean result = bluetoothAdapter.enable();
-
-    if (!result) {
-      //Throw an enabling error
-      JSONObject returnObj = new JSONObject();
-
-      addProperty(returnObj, keyError, errorEnable);
-      addProperty(returnObj, keyMessage, logNotEnabled);
-
-      callbackContext.error(returnObj);
-    }
-
-    //Else listen to initialize callback for enabling
   }
 
-  // ---------------------------------------
-  //  BIBA НЕ нужно мне это пока
-  // ---------------------------------------
+  static CallbackContext callbackContextDisableAction;
+  static final String stringDisableAction= "com.randdusing.bluetoothle.DISABLE";
+
   private void disableAction(CallbackContext callbackContext) {
+    callbackContextDisableAction = callbackContext;
+
+    Context context = cordova.getActivity().getApplicationContext();
+    Intent intent = new Intent(context, Background.class);
+    intent.setAction(stringDisableAction);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent);
+    } else {
+      context.startService(intent);
+    }
+
+
     if (isNotInitialized(callbackContext, true)) {
       return;
     }
@@ -1103,59 +1106,23 @@ public class BluetoothLePlugin extends CordovaPlugin {
   }
 
 
-  // ---------------------------------------
-  //  BIBA НЕ нужно мне это пока
-  // ---------------------------------------
+  static CallbackContext callbackContextDisconnectAction;
+  static JSONArray argsDisconnectAction;
+  static final String stringDisconnectAction= "com.randdusing.bluetoothle.DISCONNECT";
+
   private void disconnectAction(JSONArray args, CallbackContext callbackContext) {
-    if (isNotInitialized(callbackContext, true)) {
-      return;
-    }
+    callbackContextDisconnectAction = callbackContext;
+    argsDisconnectAction = args;
 
-    JSONObject obj = getArgsObject(args);
-    if (isNotArgsObject(obj, callbackContext)) {
-      return;
-    }
+    Context context = cordova.getActivity().getApplicationContext();
+    Intent intent = new Intent(context, Background.class);
+    intent.setAction(stringDisconnectAction);
 
-    String address = getAddress(obj);
-    if (isNotAddress(address, callbackContext)) {
-      return;
-    }
-
-    HashMap<Object, Object> connection = wasNeverConnected(address, callbackContext);
-    if (connection == null) {
-      return;
-    }
-
-    BluetoothGatt bluetoothGatt = (BluetoothGatt) connection.get(keyPeripheral);
-    BluetoothDevice device = bluetoothGatt.getDevice();
-
-    if (isDisconnected(connection, device, callbackContext)) {
-      return;
-    }
-
-    int state = Integer.valueOf(connection.get(keyState).toString());
-
-    JSONObject returnObj = new JSONObject();
-
-    //Return disconnecting status and keep callback
-    addDevice(returnObj, device);
-
-    //If it's connecting, cancel attempt and return disconnect
-    if (state == BluetoothProfile.STATE_CONNECTING) {
-      addProperty(returnObj, keyStatus, statusDisconnected);
-      connection.put(keyState, BluetoothProfile.STATE_DISCONNECTED);
-
-      PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-      pluginResult.setKeepCallback(false);
-      callbackContext.sendPluginResult(pluginResult);
-
-      connection.remove(operationConnect);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent);
     } else {
-      //Very unlikely that this is DISCONNECTING
-      connection.put(operationConnect, callbackContext);
+      context.startService(intent);
     }
-
-    bluetoothGatt.disconnect();
   }
 
 

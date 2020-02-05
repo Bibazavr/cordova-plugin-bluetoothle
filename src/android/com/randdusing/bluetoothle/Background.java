@@ -29,6 +29,7 @@ import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRespondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsStartAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsStopAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsUnBondAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.argsDisconnectAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextAddServiceAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextBondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextGetAdapterInfoAction;
@@ -42,6 +43,9 @@ import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextRespon
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextStartAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextStopAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextUnBondAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextEnableAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisableAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisconnectAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringAddServiceAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringBondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringGetAdapterInfoAction;
@@ -55,6 +59,9 @@ import static com.randdusing.bluetoothle.BluetoothLePlugin.stringRespondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringStartAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringStopAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.stringUnBondAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.stringEnableAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.stringDisableAction;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.stringDisconnectAction;
 
 
 import android.content.Context;
@@ -104,7 +111,7 @@ import android.bluetooth.le.ScanCallback;
 
 public class Background extends Service {
     private static String TAG = "BIBA";
-    private static final int ID_SERVICE = 101;
+    private static final int ID_SERVICE = 300;
 
     //API 21+ Scan and Advertise Callbacks
     private static ScanCallback scanCallback = null;
@@ -331,6 +338,9 @@ public class Background extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
+        Log.e("BIBA", "onCreate");
+
         // do stuff like register for BroadcastReceiver, etc.
         // Create the Foreground Service
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -366,6 +376,7 @@ public class Background extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e("BIBA", "onStartCommand");
+        Log.e("BIBA", String.format("classname= %s", Background.class.getName()));
         ///--------------------------------
         // BIBA Для запуска с автостарта
         ///--------------------------------
@@ -400,7 +411,20 @@ public class Background extends Service {
 
         String action = intent != null ? intent.getAction() : null;
         if (null == action) {
-            Toast.makeText(this, "Service auto_started.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
+        } else if (stringEnableAction.equals(action)) {
+            Log.e("BIBA", "stringEnableAction");
+            Log.e(TAG, String.format("%s", callbackContextEnableAction));
+            enableAction(callbackContextEnableAction);
+        } else if (stringDisableAction.equals(action)) {
+            Log.e("BIBA", "stringDisableAction");
+            Log.e(TAG, String.format("%s", callbackContextDisableAction));
+            disableAction(callbackContextDisableAction);
+        } else if (stringDisconnectAction.equals(action)) {
+            Log.e("BIBA", "stringDisconnectAction");
+            Log.e(TAG, String.valueOf(argsDisconnectAction));
+            Log.e(TAG, String.format("%s", callbackContextDisconnectAction));
+            disconnectAction(argsDisconnectAction, callbackContextDisconnectAction);
         } else if (stringInitializeAction.equals(action)) {
             Log.e("BIBA", "stringInitializeAction");
             Log.e(TAG, String.valueOf(argsInitializeAction));
@@ -484,6 +508,100 @@ public class Background extends Service {
         if (isBondReceiverRegistered) {
             this.unregisterReceiver(mBondReceiver);
         }
+    }
+
+    private void enableAction(CallbackContext callbackContext) {
+        if (isNotInitialized(callbackContext, false)) {
+            return;
+        }
+
+        if (isNotDisabled(callbackContext)) {
+            return;
+        }
+
+        boolean result = bluetoothAdapter.enable();
+
+        if (!result) {
+            //Throw an enabling error
+            JSONObject returnObj = new JSONObject();
+
+            addProperty(returnObj, keyError, errorEnable);
+            addProperty(returnObj, keyMessage, logNotEnabled);
+
+            callbackContext.error(returnObj);
+        }  //Else listen to initialize callback for enabling
+    }
+
+    private void disableAction(CallbackContext callbackContext) {
+        if (isNotInitialized(callbackContext, true)) {
+            return;
+        }
+
+        boolean result = bluetoothAdapter.disable();
+
+        if (!result) {
+            //Throw a disabling error
+            JSONObject returnObj = new JSONObject();
+
+            addProperty(returnObj, keyError, errorDisable);
+            addProperty(returnObj, keyMessage, logNotDisabled);
+
+            callbackContext.error(returnObj);
+        }
+
+        //Else listen to initialize callback for disabling
+    }
+
+    private void disconnectAction(JSONArray args, CallbackContext callbackContext) {
+        if (isNotInitialized(callbackContext, true)) {
+            return;
+        }
+
+        JSONObject obj = getArgsObject(args);
+        if (isNotArgsObject(obj, callbackContext)) {
+            return;
+        }
+
+        String address = getAddress(obj);
+        if (isNotAddress(address, callbackContext)) {
+            return;
+        }
+
+        HashMap<Object, Object> connection = wasNeverConnected(address, callbackContext);
+        if (connection == null) {
+            return;
+        }
+
+        BluetoothGatt bluetoothGatt = (BluetoothGatt) connection.get(keyPeripheral);
+        BluetoothDevice device = bluetoothGatt.getDevice();
+
+        if (isDisconnected(connection, device, callbackContext)) {
+            return;
+        }
+
+        int state = Integer.valueOf(connection.get(keyState).toString());
+
+        JSONObject returnObj = new JSONObject();
+
+        //Return disconnecting status and keep callback
+        addDevice(returnObj, device);
+
+        //If it's connecting, cancel attempt and return disconnect
+        if (state == BluetoothProfile.STATE_CONNECTING) {
+            addProperty(returnObj, keyStatus, statusDisconnected);
+            connection.put(keyState, BluetoothProfile.STATE_DISCONNECTED);
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+            pluginResult.setKeepCallback(false);
+            callbackContext.sendPluginResult(pluginResult);
+
+            connection.remove(operationConnect);
+        } else {
+            //Very unlikely that this is DISCONNECTING
+            connection.put(operationConnect, callbackContext);
+        }
+
+        bluetoothGatt.disconnect();
     }
 
     private void initialize(JSONArray args, CallbackContext callbackContextInitializeAction) {
@@ -803,7 +921,7 @@ public class Background extends Service {
         if (isNotArgsObject(obj, callbackContext)) {
             return;
         }
-
+//        String name = getAdapterName(obj);
         //set adapter name
         bluetoothAdapter.setName(getAdapterName(obj));
 
