@@ -124,6 +124,7 @@ public class Background extends Service {
     private static BluetoothAdapter bluetoothAdapter;
     private static boolean isReceiverRegistered = false;
     private static boolean isBondReceiverRegistered = false;
+    private static boolean isAutoStart = true;
 
     //General callback variables
     private static BluetoothGattServer gattServer;
@@ -376,42 +377,89 @@ public class Background extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e("BIBA", "onStartCommand");
-        Log.e("BIBA", String.format("classname= %s", Background.class.getName()));
-        ///--------------------------------
-        // BIBA Для запуска с автостарта
-        ///--------------------------------
-//        JSONObject obj = null;
-//        try {
-//            obj = new JSONObject("{ " +
-//                    "\"service\":\"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +
-//                    "\"characteristics\": [" +
-//                    "{" +
-//                    "\"uuid\": \"6E400002-B5A3-F393-E0A9-E50E24DCCA9E\"," +
-//                    "\"permissions\":" + "{ " +
-//                    "\"read\": \"true\", \"write\":\"true\",\"readEncryptionRequired\":\"true\", \"writeEncryptionRequired\":\"true\"" +
-//                    "}," +
-//                    "\"properties\": {" +
-//                    "\"read\": \"true\"," +
-//                    "\"writeWithoutResponse\":\"true\"," +
-//                    "\"write\":\"true\"," +
-//                    "\"notify\":\"true\"," +
-//                    "\"indicate\":\"true\"," +
-//                    "\"authenticatedSignedWrites\":\"true\"," +
-//                    "\"notifyEncryptionRequired\":\"true\"," +
-//                    "\"indicateEncryptionRequired\":\"true\"" +
-//                    "}" +
-//                    "}" +
-//                    "]" +
-//                    "}");
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-        ///--------------------------------
 
 
         String action = intent != null ? intent.getAction() : null;
         if (null == action) {
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
+            Log.e("BIBA", "AutoAction");
+
+            ///--------------------------------
+            // BIBA параметры Для запуска с автостарта
+            ///--------------------------------
+            JSONArray init = null;
+            try {
+                init = new JSONArray("{ " +
+                        "\"request\": \"true\"," +
+                        "\"statusReceiver\": \"true\"," +
+                        "\"restoreKey\": \"ZONT\"" +
+                        "}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JSONArray service = null;
+            try {
+                service = new JSONArray("{ " +
+                        "\"service\":\"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +
+                        "\"characteristics\": [" +
+                        "{" +
+                        "\"uuid\": \"6E400002-B5A3-F393-E0A9-E50E24DCCA9E\"," +
+                        "\"permissions\":" + "{ " +
+                        "\"read\": \"true\", \"write\":\"true\",\"readEncryptionRequired\":\"true\", \"writeEncryptionRequired\":\"true\"" +
+                        "}," +
+                        "\"properties\": {" +
+                        "\"read\": \"true\"," +
+                        "\"writeWithoutResponse\":\"true\"," +
+                        "\"write\":\"true\"," +
+                        "\"notify\":\"true\"," +
+                        "\"indicate\":\"true\"," +
+                        "\"authenticatedSignedWrites\":\"true\"," +
+                        "\"notifyEncryptionRequired\":\"true\"," +
+                        "\"indicateEncryptionRequired\":\"true\"" +
+                        "}" +
+                        "}," +
+                        "{" +
+                        "\"uuid\": \"6E400003-B5A3-F393-E0A9-E50E24DCCA9E\"," +
+                        "\"permissions\":" + "{ " +
+                        "\"read\": \"true\", \"write\":\"true\",\"readEncryptionRequired\":\"true\", \"writeEncryptionRequired\":\"true\"" +
+                        "}," +
+                        "\"properties\": {" +
+                        "\"read\": \"true\"," +
+                        "\"writeWithoutResponse\":\"true\"," +
+                        "\"write\":\"true\"," +
+                        "\"notify\":\"true\"," +
+                        "\"indicate\":\"true\"," +
+                        "\"authenticatedSignedWrites\":\"true\"," +
+                        "\"notifyEncryptionRequired\":\"true\"," +
+                        "\"indicateEncryptionRequired\":\"true\"" +
+                        "}" +
+                        "}" +
+                        "]" +
+                        "}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            JSONArray params_advertising = null;
+            try {
+                params_advertising = new JSONArray("{ " +
+                        "\"service\": \"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +  //Android
+                        "\"name\": \"ZONT\"," +
+                        "}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ///--------------------------------
+            initialize(init, isAutoStart);
+            createAdvertiseCallback(isAutoStart);
+
+
+            addServiceAction(service, isAutoStart);
+
+            startAdvertisingAction(params_advertising, isAutoStart);
+
+
         } else if (stringEnableAction.equals(action)) {
             Log.e("BIBA", "stringEnableAction");
             Log.e(TAG, String.format("%s", callbackContextEnableAction));
@@ -429,13 +477,13 @@ public class Background extends Service {
             Log.e("BIBA", "stringInitializeAction");
             Log.e(TAG, String.valueOf(argsInitializeAction));
             Log.e(TAG, String.format("%s", callbackContextInitializeAction));
-            initialize(argsInitializeAction, callbackContextInitializeAction);
-            createAdvertiseCallback();
+            initialize(argsInitializeAction, isAutoStart, callbackContextInitializeAction);
+            createAdvertiseCallback(isAutoStart);
         } else if (stringAddServiceAction.equals(action)) {
             Log.e("BIBA", "stringAddServiceAction");
             Log.e(TAG, String.valueOf(argsAddServiceAction));
             Log.e(TAG, String.format("%s", callbackContextAddServiceAction));
-            addServiceAction(argsAddServiceAction, callbackContextAddServiceAction);
+            addServiceAction(argsAddServiceAction, isAutoStart, callbackContextAddServiceAction);
         } else if (stringStartAdvertisingAction.equals(action)) {
             Log.e("BIBA", "stringStartAdvertisingAction");
             Log.e(TAG, String.valueOf(argsStartAdvertisingAction));
@@ -604,7 +652,7 @@ public class Background extends Service {
         bluetoothGatt.disconnect();
     }
 
-    private void initialize(JSONArray args, CallbackContext callbackContextInitializeAction) {
+    private void initialize(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContextInitializeAction) {
         //Save init callback
         JSONObject returnObj;
         if (bluetoothAdapter != null) {
@@ -616,16 +664,15 @@ public class Background extends Service {
 
                 pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
                 pluginResult.setKeepCallback(true);
-                callbackContextInitializeAction.sendPluginResult(pluginResult);
+                callbackContextInitializeAction[0].sendPluginResult(pluginResult);
             } else {
                 addProperty(returnObj, keyStatus, statusDisabled);
                 addProperty(returnObj, keyMessage, logNotEnabled);
 
                 pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
                 pluginResult.setKeepCallback(true);
-                callbackContextInitializeAction.sendPluginResult(pluginResult);
+                callbackContextInitializeAction[0].sendPluginResult(pluginResult);
             }
-
             return;
         }
 
@@ -650,7 +697,7 @@ public class Background extends Service {
             addProperty(returnObj, keyStatus, statusEnabled);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
             pluginResult.setKeepCallback(true);
-            callbackContextInitializeAction.sendPluginResult(pluginResult);
+            callbackContextInitializeAction[0].sendPluginResult(pluginResult);
         }
 
 //        boolean request = false;
@@ -658,7 +705,7 @@ public class Background extends Service {
 //            request = getRequest(obj);
 //        }
 //
-//        //Request user to enable Bluetooth
+//        //Request user to enable Bluetooth надо сделать невидимое активити и там сделать реквест
 //        if (request) {
 //            //Request Bluetooth to be enabled
 //            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -682,7 +729,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "initializePeripheral");
             addProperty(returnObj, "message", logOperationUnsupported);
 
-            callbackContextInitializeAction.error(returnObj);
+            callbackContextInitializeAction[0].error(returnObj);
             return;
         }
 
@@ -692,15 +739,15 @@ public class Background extends Service {
             gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
         }
 
-//        returnObj = new JSONObject();
-//        addProperty(returnObj, keyStatus, statusEnabled);
-//
-//        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-//        pluginResult.setKeepCallback(true);
-//        callbackContextInitializeAction.sendPluginResult(pluginResult);
+        returnObj = new JSONObject();
+        addProperty(returnObj, keyStatus, statusEnabled);
+
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+        pluginResult.setKeepCallback(true);
+        callbackContextInitializeAction[0].sendPluginResult(pluginResult);
     }
 
-    private void addServiceAction(JSONArray args, CallbackContext callbackContext) {
+    private void addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
 
 
@@ -916,7 +963,7 @@ public class Background extends Service {
         callbackContext.success(returnObj);
     }
 
-    private void startAdvertisingAction(JSONArray args, CallbackContext callbackContext) {
+    private void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext callbackContext) {
         JSONObject obj = getArgsObject(args);
         if (isNotArgsObject(obj, callbackContext)) {
             return;
@@ -926,7 +973,7 @@ public class Background extends Service {
         bluetoothAdapter.setName(getAdapterName(obj));
 
         BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-        if (advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) {
+        if ((advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) && !isAutoStart) {
             JSONObject returnObj = new JSONObject();
 
             addProperty(returnObj, "error", "startAdvertising");
@@ -951,7 +998,7 @@ public class Background extends Service {
         settingsBuilder.setConnectable(connectable);
 
         int timeout = obj.optInt("timeout", 0);
-        if (timeout < 0 || timeout > 180000) {
+        if ((timeout < 0 || timeout > 180000) && !isAutoStart) {
             JSONObject returnObj = new JSONObject();
 
             addProperty(returnObj, "error", "startAdvertising");
@@ -1344,7 +1391,7 @@ public class Background extends Service {
         callbackContext.success(returnObj);
     }
 
-    private void createAdvertiseCallback() {
+    private void createAdvertiseCallback(Boolean isAutoStart) {
         advertiseCallback = new AdvertiseCallback() {
             @Override
             public void onStartFailure(int errorCode) {
