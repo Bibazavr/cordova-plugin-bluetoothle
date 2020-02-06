@@ -16,7 +16,10 @@ import android.app.NotificationChannel;
 import androidx.core.app.NotificationCompat;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
-
+// Biba imports
+import static com.randdusing.bluetoothle.AutoStartParams.init;
+import static com.randdusing.bluetoothle.AutoStartParams.service;
+import static com.randdusing.bluetoothle.AutoStartParams.params_advertising;
 
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsAddServiceAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsBondAction;
@@ -384,85 +387,22 @@ public class Background extends Service {
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
             Log.e("BIBA", "AutoAction");
 
-            ///--------------------------------
-            // BIBA параметры Для запуска с автостарта
-            ///--------------------------------
-            JSONArray init = null;
-            try {
-                init = new JSONArray("[{ " +
-                        "\"request\": \"true\"," +
-                        "\"statusReceiver\": \"true\"," +
-                        "\"restoreKey\": \"ZONT\"" +
-                        "}]");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
 
-            JSONArray service = null;
-            try {
-                service = new JSONArray("[{ " +
-                        "\"service\":\"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +
-                        "\"characteristics\": [" +
-                        "{" +
-                        "\"uuid\": \"6E400002-B5A3-F393-E0A9-E50E24DCCA9E\"," +
-                        "\"permissions\":" + "{ " +
-                        "\"read\": \"true\", \"write\":\"true\",\"readEncryptionRequired\":\"true\", \"writeEncryptionRequired\":\"true\"" +
-                        "}," +
-                        "\"properties\": {" +
-                        "\"read\": \"true\"," +
-                        "\"writeWithoutResponse\":\"true\"," +
-                        "\"write\":\"true\"," +
-                        "\"notify\":\"true\"," +
-                        "\"indicate\":\"true\"," +
-                        "\"authenticatedSignedWrites\":\"true\"," +
-                        "\"notifyEncryptionRequired\":\"true\"," +
-                        "\"indicateEncryptionRequired\":\"true\"" +
-                        "}" +
-                        "}," +
-                        "{" +
-                        "\"uuid\": \"6E400003-B5A3-F393-E0A9-E50E24DCCA9E\"," +
-                        "\"permissions\":" + "{ " +
-                        "\"read\": \"true\", \"write\":\"true\",\"readEncryptionRequired\":\"true\", \"writeEncryptionRequired\":\"true\"" +
-                        "}," +
-                        "\"properties\": {" +
-                        "\"read\": \"true\"," +
-                        "\"writeWithoutResponse\":\"true\"," +
-                        "\"write\":\"true\"," +
-                        "\"notify\":\"true\"," +
-                        "\"indicate\":\"true\"," +
-                        "\"authenticatedSignedWrites\":\"true\"," +
-                        "\"notifyEncryptionRequired\":\"true\"," +
-                        "\"indicateEncryptionRequired\":\"true\"" +
-                        "}" +
-                        "}" +
-                        "]" +
-                        "}]");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            JSONArray params_advertising = null;
-            try {
-                params_advertising = new JSONArray("[{ " +
-                        "\"service\": \"6E400001-B5A3-F393-E0A9-E50E24DCCA9E\"," +  //Android
-                        "\"name\": \"ZONT\"" +
-                        "}]");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            ///--------------------------------
+            Log.e("BIBA", "InitializeAction");
             initialize(init, isAutoStart);
             createAdvertiseCallback(isAutoStart);
 
-
+            Log.e("BIBA", "AddServiceAction");
             addServiceAction(service, isAutoStart);
 
+            Log.e("BIBA", "StartAdvertisingAction");
             startAdvertisingAction(params_advertising, isAutoStart);
 
 
         } else if (stringEnableAction.equals(action)) {
             Log.e("BIBA", "stringEnableAction");
             Log.e(TAG, String.format("%s", callbackContextEnableAction));
+            isAutoStart = false;
             enableAction(callbackContextEnableAction);
         } else if (stringDisableAction.equals(action)) {
             Log.e("BIBA", "stringDisableAction");
@@ -748,7 +688,7 @@ public class Background extends Service {
         }
     }
 
-    private void addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
+    private void  addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
 
 
@@ -895,10 +835,12 @@ public class Background extends Service {
 
             service.addCharacteristic(characteristic);
         }
+        boolean result = gattServer.addService(service);
+
         if (isAutoStart) {
             return;
         }
-        boolean result = gattServer.addService(service);
+
         if (result) {
             JSONObject returnObj = new JSONObject();
 
@@ -976,13 +918,15 @@ public class Background extends Service {
         bluetoothAdapter.setName(getAdapterName(obj));
 
         BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
-        if ((advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) && !isAutoStart) {
-            JSONObject returnObj = new JSONObject();
+        if (advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) {
+            if (!isAutoStart) {
+                JSONObject returnObj = new JSONObject();
 
-            addProperty(returnObj, "error", "startAdvertising");
-            addProperty(returnObj, "message", "Advertising isn't supported");
+                addProperty(returnObj, "error", "startAdvertising");
+                addProperty(returnObj, "message", "Advertising isn't supported");
 
-            callbackContext[0].error(returnObj);
+                callbackContext[0].error(returnObj);
+            }
             return;
         }
 
@@ -1451,7 +1395,7 @@ public class Background extends Service {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (callbackContextInitializeAction == null) {
+            if (callbackContextInitializeAction == null && !isAutoStart) {
                 return;
             }
 
@@ -1461,23 +1405,31 @@ public class Background extends Service {
 
                 switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                     case BluetoothAdapter.STATE_OFF:
-                        addProperty(returnObj, keyStatus, statusDisabled);
-                        addProperty(returnObj, keyMessage, logNotEnabled);
+                        if (!isAutoStart) {
+                            addProperty(returnObj, keyStatus, statusDisabled);
+                            addProperty(returnObj, keyMessage, logNotEnabled);
 
-                        connections = new HashMap<Object, HashMap<Object, Object>>();
+                            connections = new HashMap<Object, HashMap<Object, Object>>();
 
-                        pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                        pluginResult.setKeepCallback(true);
-                        callbackContextInitializeAction.sendPluginResult(pluginResult);
-
+                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                            pluginResult.setKeepCallback(true);
+                            callbackContextInitializeAction.sendPluginResult(pluginResult);
+                        } else {
+                            android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case BluetoothAdapter.STATE_ON:
+                        if (isAutoStart) {
+                            startAdvertisingAction(params_advertising, isAutoStart);
+                            android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
 
-                        addProperty(returnObj, keyStatus, statusEnabled);
+                        } else {
+                            addProperty(returnObj, keyStatus, statusEnabled);
 
-                        pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                        pluginResult.setKeepCallback(true);
-                        callbackContextInitializeAction.sendPluginResult(pluginResult);
+                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                            pluginResult.setKeepCallback(true);
+                            callbackContextInitializeAction.sendPluginResult(pluginResult);
+                        }
 
                         break;
                 }
