@@ -127,7 +127,7 @@ public class Background extends Service {
     private static BluetoothAdapter bluetoothAdapter;
     private static boolean isReceiverRegistered = false;
     private static boolean isBondReceiverRegistered = false;
-    private static boolean isAutoStart = true;
+    private static boolean isAutoStart = false;
 
     //General callback variables
     private static BluetoothGattServer gattServer;
@@ -386,7 +386,7 @@ public class Background extends Service {
         if (null == action) {
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
             Log.e("BIBA", "AutoAction");
-
+            isAutoStart = true;
 
             Log.e("BIBA", "InitializeAction");
             initialize(init, isAutoStart);
@@ -402,7 +402,6 @@ public class Background extends Service {
         } else if (stringEnableAction.equals(action)) {
             Log.e("BIBA", "stringEnableAction");
             Log.e(TAG, String.format("%s", callbackContextEnableAction));
-            isAutoStart = false;
             enableAction(callbackContextEnableAction);
         } else if (stringDisableAction.equals(action)) {
             Log.e("BIBA", "stringDisableAction");
@@ -688,7 +687,7 @@ public class Background extends Service {
         }
     }
 
-    private void  addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
+    private void addServiceAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
 
 
@@ -1422,7 +1421,6 @@ public class Background extends Service {
                         if (isAutoStart) {
                             startAdvertisingAction(params_advertising, isAutoStart);
                             android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
-
                         } else {
                             addProperty(returnObj, keyStatus, statusEnabled);
 
