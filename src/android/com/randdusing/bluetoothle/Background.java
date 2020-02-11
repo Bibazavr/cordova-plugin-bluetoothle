@@ -1869,7 +1869,7 @@ public class Background extends Service {
     }
 
     private static String getAdapterName(JSONObject obj) {
-        return obj.optString(keyName, bluetoothAdapter.getName());
+        return obj.optString(keyName, "Biba");
     }
 
     private static int getWriteType(JSONObject obj) {
