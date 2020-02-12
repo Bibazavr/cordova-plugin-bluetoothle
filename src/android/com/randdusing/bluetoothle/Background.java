@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.Service;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -16,7 +15,7 @@ import android.app.NotificationChannel;
 import androidx.core.app.NotificationCompat;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
-// Biba imports
+//----------------------------------------Biba imports----------------------------------------------------------------//
 import static com.randdusing.bluetoothle.AutoStartParams.init;
 import static com.randdusing.bluetoothle.AutoStartParams.service;
 import static com.randdusing.bluetoothle.AutoStartParams.params_advertising;
@@ -49,23 +48,10 @@ import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextUnBond
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextEnableAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisableAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisconnectAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringAddServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringGetAdapterInfoAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringInitializeAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringIsAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringIsBondedAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringNotifyAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringRemoveAllServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringRemoveServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringRespondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringStartAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringStopAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringUnBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringEnableAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringDisableAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.stringDisconnectAction;
+import static com.randdusing.bluetoothle.Actions.*;
+import static com.randdusing.bluetoothle.Constants.*;
 
+//-----------------------------------------Biba imports end-----------------------------------------------------------//
 
 import android.content.Context;
 import android.content.Intent;
@@ -120,11 +106,7 @@ public class Background extends Service {
     private static ScanCallback scanCallback = null;
     private static AdvertiseCallback advertiseCallback = null;
 
-    //Initialization related variables
-    private static final int REQUEST_BT_ENABLE = 59627; /*Random integer*/
-    private static final int REQUEST_ACCESS_COARSE_LOCATION = 59628;
-    private static final int REQUEST_LOCATION_SOURCE_SETTINGS = 59629;
-    private static BluetoothAdapter bluetoothAdapter;
+    static BluetoothAdapter bluetoothAdapter;
     private static boolean isReceiverRegistered = false;
     private static boolean isBondReceiverRegistered = false;
     private static boolean isAutoStart = false;
@@ -138,207 +120,6 @@ public class Background extends Service {
 
     //Store bonds
     private static HashMap<String, CallbackContext> bonds = new HashMap<String, CallbackContext>();
-
-
-    //Object keys
-    private static final String keyStatus = "status";
-    private static final String keyError = "error";
-    private static final String keyMessage = "message";
-    private static final String keyRequest = "request";
-    private static final String keyStatusReceiver = "statusReceiver";
-    private static final String keyName = "name";
-    private static final String keyAddress = "address";
-    private static final String keyRssi = "rssi";
-    private static final String keyScanMode = "scanMode";
-    private static final String keyMatchMode = "matchMode";
-    private static final String keyMatchNum = "matchNum";
-    private static final String keyCallbackType = "callbackType";
-    private static final String keyAdvertisement = "advertisement";
-    private static final String keyUuid = "uuid";
-    private static final String keyService = "service";
-    private static final String keyServices = "services";
-    private static final String keyCharacteristic = "characteristic";
-    private static final String keyCharacteristics = "characteristics";
-    private static final String keyProperties = "properties";
-    private static final String keyPermissions = "permissions";
-    private static final String keyDescriptor = "descriptor";
-    private static final String keyDescriptors = "descriptors";
-    private static final String keyValue = "value";
-    private static final String keyType = "type";
-    private static final String keyIsInitialized = "isInitialized";
-    private static final String keyIsEnabled = "isEnabled";
-    private static final String keyIsScanning = "isScanning";
-    private static final String keyIsBonded = "isBonded";
-    private static final String keyIsConnected = "isConnected";
-    private static final String keyIsDiscovered = "isDiscovered";
-    private static final String keyIsDiscoverable = "isDiscoverable";
-    private static final String keyPeripheral = "peripheral";
-    private static final String keyState = "state";
-    private static final String keyDiscoveredState = "discoveredState";
-    private static final String keyConnectionPriority = "connectionPriority";
-    private static final String keyMtu = "mtu";
-
-    //Write Types
-    private static final String writeTypeNoResponse = "noResponse";
-
-    //Status Types
-    private static final String statusEnabled = "enabled";
-    private static final String statusDisabled = "disabled";
-    private static final String statusScanStarted = "scanStarted";
-    private static final String statusScanStopped = "scanStopped";
-    private static final String statusScanResult = "scanResult";
-    private static final String statusBonded = "bonded";
-    private static final String statusBonding = "bonding";
-    private static final String statusUnbonded = "unbonded";
-    private static final String statusConnected = "connected";
-    private static final String statusDisconnected = "disconnected";
-    private static final String statusClosed = "closed";
-    private static final String statusDiscovered = "discovered";
-    private static final String statusRead = "read";
-    private static final String statusSubscribed = "subscribed";
-    private static final String statusSubscribedResult = "subscribedResult";
-    private static final String statusUnsubscribed = "unsubscribed";
-    private static final String statusWritten = "written";
-    private static final String statusReadDescriptor = "readDescriptor";
-    private static final String statusWrittenDescriptor = "writtenDescriptor";
-    private static final String statusRssi = "rssi";
-    private static final String statusConnectionPriorityRequested = "connectionPriorityRequested";
-    private static final String statusMtu = "mtu";
-
-    //Properties
-    private static final String propertyBroadcast = "broadcast";
-    private static final String propertyRead = "read";
-    private static final String propertyWriteWithoutResponse = "writeWithoutResponse";
-    private static final String propertyWrite = "write";
-    private static final String propertyNotify = "notify";
-    private static final String propertyIndicate = "indicate";
-    private static final String propertyAuthenticatedSignedWrites = "authenticatedSignedWrites";
-    private static final String propertyExtendedProperties = "extendedProperties";
-    private static final String propertyNotifyEncryptionRequired = "notifyEncryptionRequired";
-    private static final String propertyIndicateEncryptionRequired = "indicateEncryptionRequired";
-    private static final String propertyConnectionPriorityHigh = "high";
-    private static final String propertyConnectionPriorityLow = "low";
-    private static final String propertyConnectionPriorityBalanced = "balanced";
-
-    //Permissions
-    private static final String permissionRead = "read";
-    private static final String permissionReadEncrypted = "readEncrypted";
-    private static final String permissionReadEncryptedMITM = "readEncryptedMITM";
-    private static final String permissionWrite = "write";
-    private static final String permissionWriteEncrypted = "writeEncrypted";
-    private static final String permissionWriteEncryptedMITM = "writeEncryptedMITM";
-    private static final String permissionWriteSigned = "writeSigned";
-    private static final String permissionWriteSignedMITM = "writeSignedMITM";
-
-    //Error Types
-    private static final String errorInitialize = "initialize";
-    private static final String errorEnable = "enable";
-    private static final String errorDisable = "disable";
-    private static final String errorArguments = "arguments";
-    private static final String errorStartScan = "startScan";
-    private static final String errorStopScan = "stopScan";
-    private static final String errorBond = "bond";
-    private static final String errorUnbond = "unbond";
-    private static final String errorConnect = "connect";
-    private static final String errorReconnect = "reconnect";
-    private static final String errorDiscover = "discover";
-    private static final String errorServices = "services";
-    private static final String errorCharacteristics = "characteristics";
-    private static final String errorDescriptors = "descriptors";
-    private static final String errorRead = "read";
-    private static final String errorSubscription = "subscription";
-    private static final String errorWrite = "write";
-    private static final String errorReadDescriptor = "readDescriptor";
-    private static final String errorWriteDescriptor = "writeDescriptor";
-    private static final String errorRssi = "rssi";
-    private static final String errorNeverConnected = "neverConnected";
-    private static final String errorIsNotDisconnected = "isNotDisconnected";
-    private static final String errorIsNotConnected = "isNotConnected";
-    private static final String errorIsDisconnected = "isDisconnected";
-    private static final String errorService = "service";
-    private static final String errorCharacteristic = "characteristic";
-    private static final String errorDescriptor = "descriptor";
-    private static final String errorRequestConnectionPriority = "requestConnectPriority";
-    private static final String errorMtu = "mtu";
-
-    //Error Messages
-    //Initialization
-    private static final String logNotEnabled = "Bluetooth not enabled";
-    private static final String logNotDisabled = "Bluetooth not disabled";
-    private static final String logNotInit = "Bluetooth not initialized";
-    private static final String logOperationUnsupported = "Operation unsupported";
-    //Scanning
-    private static final String logAlreadyScanning = "Scanning already in progress";
-    private static final String logScanStartFail = "Scan failed to start";
-    private static final String logNotScanning = "Not scanning";
-    //Bonding
-    private static final String logBonded = "Device already bonded";
-    private static final String logBonding = "Device already bonding";
-    private static final String logUnbonded = "Device already unbonded";
-    private static final String logBondFail = "Device failed to bond on return";
-    private static final String logUnbondFail = "Device failed to unbond on return";
-    //Connection
-    private static final String logPreviouslyConnected = "Device previously connected, reconnect or close for new device";
-    private static final String logConnectFail = "Connection failed";
-    private static final String logNeverConnected = "Never connected to device";
-    private static final String logIsNotConnected = "Device isn't connected";
-    private static final String logIsNotDisconnected = "Device isn't disconnected";
-    private static final String logIsDisconnected = "Device is disconnected";
-    private static final String logNoAddress = "No device address";
-    private static final String logNoDevice = "Device not found";
-    private static final String logReconnectFail = "Reconnection to device failed";
-    //Discovery
-    private static final String logAlreadyDiscovering = "Already discovering device";
-    private static final String logDiscoveryFail = "Unable to discover device";
-    //Read/write
-    private static final String logNoArgObj = "Argument object not found";
-    private static final String logNoService = "Service not found";
-    private static final String logNoCharacteristic = "Characteristic not found";
-    private static final String logNoDescriptor = "Descriptor not found";
-    private static final String logReadFail = "Unable to read";
-    private static final String logReadFailReturn = "Unable to read on return";
-    private static final String logSubscribeFail = "Unable to subscribe";
-    private static final String logSubscribeAlready = "Already subscribed";
-    private static final String logUnsubscribeFail = "Unable to unsubscribe";
-    private static final String logUnsubscribeAlready = "Already unsubscribed";
-    private static final String logWriteFail = "Unable to write";
-    private static final String logWriteFailReturn = "Unable to write on return";
-    private static final String logWriteValueNotFound = "Write value not found";
-    private static final String logWriteValueNotSet = "Write value not set";
-    private static final String logReadDescriptorFail = "Unable to read descriptor";
-    private static final String logReadDescriptorFailReturn = "Unable to read descriptor on return";
-    private static final String logWriteDescriptorNotAllowed = "Unable to write client configuration descriptor";
-    private static final String logWriteDescriptorFail = "Unable to write descriptor";
-    private static final String logWriteDescriptorValueNotFound = "Write descriptor value not found";
-    private static final String logWriteDescriptorValueNotSet = "Write descriptor value not set";
-    private static final String logWriteDescriptorFailReturn = "Descriptor not written on return";
-    private static final String logRssiFail = "Unable to read RSSI";
-    private static final String logRssiFailReturn = "Unable to read RSSI on return";
-    //Request Connection Priority
-    private static final String logRequestConnectionPriorityNull = "Request connection priority not set";
-    private static final String logRequestConnectionPriorityInvalid = "Request connection priority is invalid";
-    private static final String logRequestConnectionPriorityFailed = "Request connection priority failed";
-    //MTU
-    private static final String logMtuFail = "Unable to set MTU";
-    private static final String logMtuFailReturn = "Unable to set MTU on return";
-
-    private static final String logRequiresAPI21 = "Requires API level 21";
-
-    private static final String operationConnect = "connect";
-    private static final String operationDiscover = "discover";
-    private static final String operationRssi = "rssi";
-    private static final String operationRead = "read";
-    private static final String operationSubscribe = "subscribe";
-    private static final String operationUnsubscribe = "unsubscribe";
-    private static final String operationWrite = "write";
-    private static final String operationMtu = "mtu";
-
-    private static final String baseUuidStart = "0000";
-    private static final String baseUuidEnd = "-0000-1000-8000-00805F9B34FB";
-
-    //Client Configuration UUID for notifying/indicating
-    private final UUID clientConfigurationDescriptorUuid = UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -358,7 +139,6 @@ public class Background extends Service {
         startForeground(ID_SERVICE, notification);
     }
 
-    //    @RequiresApi(Build.VERSION_CODES.O)
     private String createNotificationChannel(NotificationManager notificationManager) {
         String channelId = "6969";
         String channelName = "BIBA";
@@ -398,90 +178,68 @@ public class Background extends Service {
             Log.e("BIBA", "StartAdvertisingAction");
             startAdvertisingAction(params_advertising, isAutoStart);
 
-
         } else if (stringEnableAction.equals(action)) {
             Log.e("BIBA", "stringEnableAction");
-            Log.e(TAG, String.format("%s", callbackContextEnableAction));
             enableAction(callbackContextEnableAction);
         } else if (stringDisableAction.equals(action)) {
             Log.e("BIBA", "stringDisableAction");
-            Log.e(TAG, String.format("%s", callbackContextDisableAction));
             disableAction(callbackContextDisableAction);
         } else if (stringDisconnectAction.equals(action)) {
             Log.e("BIBA", "stringDisconnectAction");
             Log.e(TAG, String.valueOf(argsDisconnectAction));
-            Log.e(TAG, String.format("%s", callbackContextDisconnectAction));
             disconnectAction(argsDisconnectAction, callbackContextDisconnectAction);
         } else if (stringInitializeAction.equals(action)) {
             Log.e("BIBA", "stringInitializeAction");
             Log.e(TAG, String.valueOf(argsInitializeAction));
-            Log.e(TAG, String.format("%s", callbackContextInitializeAction));
             initialize(argsInitializeAction, isAutoStart, callbackContextInitializeAction);
             createAdvertiseCallback(isAutoStart);
         } else if (stringAddServiceAction.equals(action)) {
             Log.e("BIBA", "stringAddServiceAction");
             Log.e(TAG, String.valueOf(argsAddServiceAction));
-            Log.e(TAG, String.format("%s", callbackContextAddServiceAction));
             addServiceAction(argsAddServiceAction, isAutoStart, callbackContextAddServiceAction);
         } else if (stringStartAdvertisingAction.equals(action)) {
             Log.e("BIBA", "stringStartAdvertisingAction");
             Log.e(TAG, String.valueOf(argsStartAdvertisingAction));
-            Log.e(TAG, String.format("%s", callbackContextStartAdvertisingAction));
             startAdvertisingAction(argsStartAdvertisingAction, isAutoStart, callbackContextStartAdvertisingAction);
         } else if (stringRespondAction.equals(action)) {
             Log.e("BIBA", "stringRespondAction");
             Log.e(TAG, String.valueOf(argsRespondAction));
-            Log.e(TAG, String.format("%s", callbackContextRespondAction));
             respondAction(argsRespondAction, callbackContextRespondAction);
         } else if (stringNotifyAction.equals(action)) {
             Log.e("BIBA", "stringNotifyAction");
             Log.e(TAG, String.valueOf(argsNotifyAction));
-            Log.e(TAG, String.format("%s", callbackContextNotifyAction));
             notifyAction(argsNotifyAction, callbackContextNotifyAction);
         } else if (stringRemoveServiceAction.equals(action)) {
             Log.e("BIBA", "stringRemoveServiceAction");
             Log.e(TAG, String.valueOf(argsRemoveServiceAction));
-            Log.e(TAG, String.format("%s", callbackContextRemoveServiceAction));
             removeServiceAction(argsRemoveServiceAction, callbackContextRemoveServiceAction);
         } else if (stringRemoveAllServiceAction.equals(action)) {
             Log.e("BIBA", "stringRemoveAllServiceAction");
             Log.e(TAG, String.valueOf(argsRemoveAllServiceAction));
-            Log.e(TAG, String.format("%s", callbackContextRemoveAllServiceAction));
             removeAllServicesAction(argsRemoveAllServiceAction, callbackContextRemoveAllServiceAction);
         } else if (stringStopAdvertisingAction.equals(action)) {
             Log.e("BIBA", "stringStopAdvertisingAction");
             Log.e(TAG, String.valueOf(argsStopAdvertisingAction));
-            Log.e(TAG, String.format("%s", callbackContextStopAdvertisingAction));
             stopAdvertisingAction(argsStopAdvertisingAction, callbackContextStopAdvertisingAction);
         } else if (stringIsAdvertisingAction.equals(action)) {
             Log.e("BIBA", "stringIsAdvertisingAction");
-            Log.e(TAG, String.format("%s", callbackContextIsAdvertisingAction));
             isAdvertisingAction(callbackContextIsAdvertisingAction);
         } else if (stringGetAdapterInfoAction.equals(action)) {
             Log.e("BIBA", "stringGetAdapterInfoAction");
-            Log.e(TAG, String.format("%s", callbackContextGetAdapterInfoAction));
             getAdapterInfoAction(callbackContextGetAdapterInfoAction);
         } else if (stringBondAction.equals(action)) {
             Log.e("BIBA", "stringBondAction");
             Log.e(TAG, String.valueOf(argsBondAction));
-            Log.e(TAG, String.format("%s", callbackContextBondAction));
             bondAction(argsBondAction, callbackContextBondAction);
         } else if (stringUnBondAction.equals(action)) {
             Log.e("BIBA", "stringUnBondAction");
             Log.e(TAG, String.valueOf(argsUnBondAction));
-            Log.e(TAG, String.format("%s", callbackContextUnBondAction));
             unbondAction(argsUnBondAction, callbackContextUnBondAction);
         } else if (stringIsBondedAction.equals(action)) {
             Log.e("BIBA", "stringIsBondedAction");
             Log.e(TAG, String.valueOf(argsIsBondedAction));
-            Log.e(TAG, String.format("%s", callbackContextIsBondedAction));
             isBondedAction(argsIsBondedAction, callbackContextIsBondedAction);
         }
-
-//        initialize(argsInitializeAction, callbackContextService);
-//        initializePeripheral(callbackContextService);
-//        addServiceAction(argsService, callbackContextService);
-//        startAdvertisingAction(callbackContextService);
         return START_STICKY;
     }
 
@@ -1760,7 +1518,7 @@ public class Background extends Service {
     }
 
     //General Helpers
-    private static void addProperty(JSONObject obj, String key, Object value) {
+    static void addProperty(JSONObject obj, String key, Object value) {
         //Believe exception only occurs when adding duplicate keys, so just ignore it
         try {
             if (value == null) {
@@ -1769,6 +1527,7 @@ public class Background extends Service {
                 obj.put(key, value);
             }
         } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1783,6 +1542,7 @@ public class Background extends Service {
             try {
                 return args.getJSONObject(0);
             } catch (JSONException ex) {
+                ex.printStackTrace();
             }
         }
 
@@ -1836,6 +1596,7 @@ public class Background extends Service {
                 UUID uuid = UUID.fromString(value);
                 arrayList.add(uuid);
             } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
 

@@ -52,8 +52,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-@SuppressWarnings("unchecked")
+import static com.randdusing.bluetoothle.Actions.*;
 
+@SuppressWarnings("unchecked")
 public class BluetoothLePlugin extends CordovaPlugin {
   //Initialization related variables
   private final int REQUEST_BT_ENABLE = 59627; /*Random integer*/
@@ -428,7 +429,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextInitializeAction;
   static JSONArray argsInitializeAction;
-  static final String stringInitializeAction = "com.randdusing.bluetoothle.INITIALIZE";
 
   private void initializeAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextInitializeAction = callbackContext;
@@ -448,7 +448,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextAddServiceAction;
   static JSONArray argsAddServiceAction;
-  static final String stringAddServiceAction = "com.randdusing.bluetoothle.ADD_SERVICE";
 
   private void addServiceAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextAddServiceAction = callbackContext;
@@ -468,7 +467,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextRemoveServiceAction;
   static JSONArray argsRemoveServiceAction;
-  static final String stringRemoveServiceAction = "com.randdusing.bluetoothle.REMOVE_SERVICE";
 
   private void removeServiceAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextRemoveServiceAction = callbackContext;
@@ -488,7 +486,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextRemoveAllServiceAction;
   static JSONArray argsRemoveAllServiceAction;
-  static final String stringRemoveAllServiceAction = "com.randdusing.bluetoothle.REMOVE_ALL_SERVICE";
 
   private void removeAllServicesAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextRemoveAllServiceAction = callbackContext;
@@ -508,7 +505,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextStartAdvertisingAction;
   static JSONArray argsStartAdvertisingAction;
-  static final String stringStartAdvertisingAction = "com.randdusing.bluetoothle.START_ADVERTISING";
 
   private void startAdvertisingAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextStartAdvertisingAction = callbackContext;
@@ -528,7 +524,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextStopAdvertisingAction;
   static JSONArray argsStopAdvertisingAction;
-  static final String stringStopAdvertisingAction = "com.randdusing.bluetoothle.STOP_ADVERTISING";
 
   private void stopAdvertisingAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextStopAdvertisingAction = callbackContext;
@@ -547,7 +542,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
 
   static CallbackContext callbackContextIsAdvertisingAction;
-  static final String stringIsAdvertisingAction = "com.randdusing.bluetoothle.IS_ADVERTISING";
 
   private void isAdvertisingAction(CallbackContext callbackContext) {
     callbackContextIsAdvertisingAction = callbackContext;
@@ -572,7 +566,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextRespondAction;
   static JSONArray argsRespondAction;
-  static final String stringRespondAction = "com.randdusing.bluetoothle.RESPOND";
 
   private void respondAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextRespondAction = callbackContext;
@@ -592,7 +585,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextNotifyAction;
   static JSONArray argsNotifyAction;
-  static final String stringNotifyAction = "com.randdusing.bluetoothle.NOTIFY";
 
   private void notifyAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextNotifyAction = callbackContext;
@@ -697,7 +689,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
 
   static CallbackContext callbackContextGetAdapterInfoAction;
-  static final String stringGetAdapterInfoAction = "com.randdusing.bluetoothle.GET_ADAPTER_INFO";
   /**
   * Retrieves a minimal set of adapter details
   * (address, name, initialized state, enabled state, scanning state, discoverable state)
@@ -718,7 +709,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
 
   static CallbackContext callbackContextEnableAction;
-  static final String stringEnableAction = "com.randdusing.bluetoothle.ENABLE";
 
   private void enableAction(CallbackContext callbackContext) {
     callbackContextEnableAction = callbackContext;
@@ -735,7 +725,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
   }
 
   static CallbackContext callbackContextDisableAction;
-  static final String stringDisableAction= "com.randdusing.bluetoothle.DISABLE";
 
   private void disableAction(CallbackContext callbackContext) {
     callbackContextDisableAction = callbackContext;
@@ -966,7 +955,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextBondAction;
   static JSONArray argsBondAction;
-  static final String stringBondAction= "com.randdusing.bluetoothle.BOND";
 
   private void bondAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextBondAction = callbackContext;
@@ -986,7 +974,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextUnBondAction;
   static JSONArray argsUnBondAction;
-  static final String stringUnBondAction= "com.randdusing.bluetoothle.UNBOND";
 
   private void unbondAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextUnBondAction = callbackContext;
@@ -1108,7 +1095,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextDisconnectAction;
   static JSONArray argsDisconnectAction;
-  static final String stringDisconnectAction= "com.randdusing.bluetoothle.DISCONNECT";
 
   private void disconnectAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextDisconnectAction = callbackContext;
@@ -2114,7 +2100,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
   static CallbackContext callbackContextIsBondedAction;
   static JSONArray argsIsBondedAction;
-  static final String stringIsBondedAction= "com.randdusing.bluetoothle.IS_BONDED";
 
   private void isBondedAction(JSONArray args, CallbackContext callbackContext) {
     callbackContextIsBondedAction = callbackContext;
@@ -2454,40 +2439,7 @@ public class BluetoothLePlugin extends CordovaPlugin {
     }
   };
 
-  // ---------------------------------------
-  //  BIBA Надо новое невидиммое активити создать и там из ресивера вызывать вот этот метод
-  // ---------------------------------------
-  @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    //If this was a Bluetooth enablement request...
-    if (requestCode == REQUEST_BT_ENABLE) {
-      //If callback doesnt exist, no reason to proceed
-      if (initCallbackContext == null) {
-        return;
-      }
 
-      //Whether the result code was successful or not, just check whether Bluetooth is enabled
-      if (!bluetoothAdapter.isEnabled()) {
-        JSONObject returnObj = new JSONObject();
-        addProperty(returnObj, keyStatus, statusDisabled);
-        addProperty(returnObj, keyMessage, logNotEnabled);
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, returnObj);
-        pluginResult.setKeepCallback(true);
-        initCallbackContext.sendPluginResult(pluginResult);
-      }
-    } else if (requestCode == REQUEST_LOCATION_SOURCE_SETTINGS) {
-      if (locationCallback != null) {
-        JSONObject returnObj = new JSONObject();
-
-        addProperty(returnObj, "requestLocation", isLocationEnabled());
-
-        locationCallback.success(returnObj);
-
-        locationCallback = null;
-      }
-    }
-  }
 
   // ---------------------------------------
   //  BIBA НЕ нужно мне это пока
