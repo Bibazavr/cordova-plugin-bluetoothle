@@ -23,4 +23,7 @@ public class Actions {
     static final String stringIsBondedAction= "com.randdusing.bluetoothle.IS_BONDED";
 
     static final String stringDisconnectAction= "com.randdusing.bluetoothle.DISCONNECT";
+
+
+    static final String stringBluetoothOnAction= "com.randdusing.bluetoothle.ON";
 }

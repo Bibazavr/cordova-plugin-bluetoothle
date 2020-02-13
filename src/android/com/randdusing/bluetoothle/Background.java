@@ -29,7 +29,6 @@ import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRemoveAllServiceA
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRemoveServiceAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRespondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsStartAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsStopAdvertisingAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsUnBondAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.argsDisconnectAction;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextAddServiceAction;
@@ -99,7 +98,7 @@ import android.bluetooth.le.ScanCallback;
 
 
 public class Background extends Service {
-    private static String TAG = "BIBA";
+    private static String TAG = "Background";
     private static final int ID_SERVICE = 300;
 
     //API 21+ Scan and Advertise Callbacks
@@ -109,7 +108,7 @@ public class Background extends Service {
     static BluetoothAdapter bluetoothAdapter;
     private static boolean isReceiverRegistered = false;
     private static boolean isBondReceiverRegistered = false;
-    private static boolean isAutoStart = false;
+    static boolean isAutoStart = false;
 
     //General callback variables
     private static BluetoothGattServer gattServer;
@@ -120,11 +119,12 @@ public class Background extends Service {
 
     //Store bonds
     private static HashMap<String, CallbackContext> bonds = new HashMap<String, CallbackContext>();
+
     @Override
     public void onCreate() {
         super.onCreate();
         Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
-        Log.e("BIBA", "onCreate");
+        Log.e(TAG, "onCreate");
 
         // do stuff like register for BroadcastReceiver, etc.
         // Create the Foreground Service
@@ -141,7 +141,7 @@ public class Background extends Service {
 
     private String createNotificationChannel(NotificationManager notificationManager) {
         String channelId = "6969";
-        String channelName = "BIBA";
+        String channelName = TAG;
         NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
         // omitted the LED color
         channel.setImportance(NotificationManager.IMPORTANCE_NONE);
@@ -159,86 +159,110 @@ public class Background extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("BIBA", "onStartCommand");
+        Log.e(TAG, "onStartCommand");
 
 
         String action = intent != null ? intent.getAction() : null;
+
+
         if (null == action) {
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
-            Log.e("BIBA", "AutoAction");
+            Log.e(TAG, "AutoAction");
             isAutoStart = true;
 
-            Log.e("BIBA", "InitializeAction");
+            Log.e(TAG, "InitializeAction");
             initialize(init, isAutoStart);
-            createAdvertiseCallback(isAutoStart);
 
-            Log.e("BIBA", "AddServiceAction");
-            addServiceAction(service, isAutoStart);
 
-            Log.e("BIBA", "StartAdvertisingAction");
-            startAdvertisingAction(params_advertising, isAutoStart);
+        } else {
+            isAutoStart = false;
+            switch (action) {
+                case stringBluetoothOnAction:
+                    Log.e("BIBA", "AddServiceAction");
+                    addServiceAction(service, isAutoStart);
 
-        } else if (stringEnableAction.equals(action)) {
-            Log.e("BIBA", "stringEnableAction");
-            enableAction(callbackContextEnableAction);
-        } else if (stringDisableAction.equals(action)) {
-            Log.e("BIBA", "stringDisableAction");
-            disableAction(callbackContextDisableAction);
-        } else if (stringDisconnectAction.equals(action)) {
-            Log.e("BIBA", "stringDisconnectAction");
-            Log.e(TAG, String.valueOf(argsDisconnectAction));
-            disconnectAction(argsDisconnectAction, callbackContextDisconnectAction);
-        } else if (stringInitializeAction.equals(action)) {
-            Log.e("BIBA", "stringInitializeAction");
-            Log.e(TAG, String.valueOf(argsInitializeAction));
-            initialize(argsInitializeAction, isAutoStart, callbackContextInitializeAction);
-            createAdvertiseCallback(isAutoStart);
-        } else if (stringAddServiceAction.equals(action)) {
-            Log.e("BIBA", "stringAddServiceAction");
-            Log.e(TAG, String.valueOf(argsAddServiceAction));
-            addServiceAction(argsAddServiceAction, isAutoStart, callbackContextAddServiceAction);
-        } else if (stringStartAdvertisingAction.equals(action)) {
-            Log.e("BIBA", "stringStartAdvertisingAction");
-            Log.e(TAG, String.valueOf(argsStartAdvertisingAction));
-            startAdvertisingAction(argsStartAdvertisingAction, isAutoStart, callbackContextStartAdvertisingAction);
-        } else if (stringRespondAction.equals(action)) {
-            Log.e("BIBA", "stringRespondAction");
-            Log.e(TAG, String.valueOf(argsRespondAction));
-            respondAction(argsRespondAction, callbackContextRespondAction);
-        } else if (stringNotifyAction.equals(action)) {
-            Log.e("BIBA", "stringNotifyAction");
-            Log.e(TAG, String.valueOf(argsNotifyAction));
-            notifyAction(argsNotifyAction, callbackContextNotifyAction);
-        } else if (stringRemoveServiceAction.equals(action)) {
-            Log.e("BIBA", "stringRemoveServiceAction");
-            Log.e(TAG, String.valueOf(argsRemoveServiceAction));
-            removeServiceAction(argsRemoveServiceAction, callbackContextRemoveServiceAction);
-        } else if (stringRemoveAllServiceAction.equals(action)) {
-            Log.e("BIBA", "stringRemoveAllServiceAction");
-            Log.e(TAG, String.valueOf(argsRemoveAllServiceAction));
-            removeAllServicesAction(argsRemoveAllServiceAction, callbackContextRemoveAllServiceAction);
-        } else if (stringStopAdvertisingAction.equals(action)) {
-            Log.e("BIBA", "stringStopAdvertisingAction");
-            Log.e(TAG, String.valueOf(argsStopAdvertisingAction));
-            stopAdvertisingAction(argsStopAdvertisingAction, callbackContextStopAdvertisingAction);
-        } else if (stringIsAdvertisingAction.equals(action)) {
-            Log.e("BIBA", "stringIsAdvertisingAction");
-            isAdvertisingAction(callbackContextIsAdvertisingAction);
-        } else if (stringGetAdapterInfoAction.equals(action)) {
-            Log.e("BIBA", "stringGetAdapterInfoAction");
-            getAdapterInfoAction(callbackContextGetAdapterInfoAction);
-        } else if (stringBondAction.equals(action)) {
-            Log.e("BIBA", "stringBondAction");
-            Log.e(TAG, String.valueOf(argsBondAction));
-            bondAction(argsBondAction, callbackContextBondAction);
-        } else if (stringUnBondAction.equals(action)) {
-            Log.e("BIBA", "stringUnBondAction");
-            Log.e(TAG, String.valueOf(argsUnBondAction));
-            unbondAction(argsUnBondAction, callbackContextUnBondAction);
-        } else if (stringIsBondedAction.equals(action)) {
-            Log.e("BIBA", "stringIsBondedAction");
-            Log.e(TAG, String.valueOf(argsIsBondedAction));
-            isBondedAction(argsIsBondedAction, callbackContextIsBondedAction);
+                    Log.e("BIBA", "StartAdvertisingAction");
+                    startAdvertisingAction(params_advertising, isAutoStart);
+                    break;
+                case stringEnableAction:
+                    Log.e("BIBA", "stringEnableAction");
+                    enableAction(callbackContextEnableAction);
+                    break;
+                case stringDisableAction:
+                    Log.e("BIBA", "stringDisableAction");
+                    disableAction(callbackContextDisableAction);
+                    break;
+                case stringDisconnectAction:
+                    Log.e("BIBA", "stringDisconnectAction");
+                    Log.e(TAG, String.valueOf(argsDisconnectAction));
+                    disconnectAction(argsDisconnectAction, callbackContextDisconnectAction);
+                    break;
+                case stringInitializeAction:
+                    Log.e("BIBA", "stringInitializeAction");
+                    Log.e(TAG, String.valueOf(argsInitializeAction));
+                    initialize(argsInitializeAction, isAutoStart, callbackContextInitializeAction);
+                    if (advertiseCallback == null) {
+                        createAdvertiseCallback(isAutoStart);
+                    }
+                    break;
+                case stringAddServiceAction:
+                    Log.e("BIBA", "stringAddServiceAction");
+                    Log.e(TAG, String.valueOf(argsAddServiceAction));
+                    addServiceAction(argsAddServiceAction, isAutoStart, callbackContextAddServiceAction);
+                    break;
+                case stringStartAdvertisingAction:
+                    Log.e("BIBA", "stringStartAdvertisingAction");
+                    Log.e(TAG, String.valueOf(argsStartAdvertisingAction));
+                    startAdvertisingAction(argsStartAdvertisingAction, isAutoStart, callbackContextStartAdvertisingAction);
+                    break;
+                case stringRespondAction:
+                    Log.e("BIBA", "stringRespondAction");
+                    Log.e(TAG, String.valueOf(argsRespondAction));
+                    respondAction(argsRespondAction, callbackContextRespondAction);
+                    break;
+                case stringNotifyAction:
+                    Log.e("BIBA", "stringNotifyAction");
+                    Log.e(TAG, String.valueOf(argsNotifyAction));
+                    notifyAction(argsNotifyAction, callbackContextNotifyAction);
+                    break;
+                case stringRemoveServiceAction:
+                    Log.e("BIBA", "stringRemoveServiceAction");
+                    Log.e(TAG, String.valueOf(argsRemoveServiceAction));
+                    removeServiceAction(argsRemoveServiceAction, callbackContextRemoveServiceAction);
+                    break;
+                case stringRemoveAllServiceAction:
+                    Log.e("BIBA", "stringRemoveAllServiceAction");
+                    Log.e(TAG, String.valueOf(argsRemoveAllServiceAction));
+                    removeAllServicesAction(argsRemoveAllServiceAction, callbackContextRemoveAllServiceAction);
+                    break;
+                case stringStopAdvertisingAction:
+                    Log.e("BIBA", "stringStopAdvertisingAction");
+                    stopAdvertisingAction(callbackContextStopAdvertisingAction);
+                    break;
+                case stringIsAdvertisingAction:
+                    Log.e("BIBA", "stringIsAdvertisingAction");
+                    isAdvertisingAction(callbackContextIsAdvertisingAction);
+                    break;
+                case stringGetAdapterInfoAction:
+                    Log.e("BIBA", "stringGetAdapterInfoAction");
+                    getAdapterInfoAction(callbackContextGetAdapterInfoAction);
+                    break;
+                case stringBondAction:
+                    Log.e("BIBA", "stringBondAction");
+                    Log.e(TAG, String.valueOf(argsBondAction));
+                    bondAction(argsBondAction, callbackContextBondAction);
+                    break;
+                case stringUnBondAction:
+                    Log.e("BIBA", "stringUnBondAction");
+                    Log.e(TAG, String.valueOf(argsUnBondAction));
+                    unbondAction(argsUnBondAction, callbackContextUnBondAction);
+                    break;
+                case stringIsBondedAction:
+                    Log.e("BIBA", "stringIsBondedAction");
+                    Log.e(TAG, String.valueOf(argsIsBondedAction));
+                    isBondedAction(argsIsBondedAction, callbackContextIsBondedAction);
+                    break;
+            }
         }
         return START_STICKY;
     }
@@ -352,69 +376,66 @@ public class Background extends Service {
     private void initialize(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContextInitializeAction) {
         //Save init callback
         JSONObject returnObj;
-        if (bluetoothAdapter != null) {
-            returnObj = new JSONObject();
-            PluginResult pluginResult;
-
-            if (bluetoothAdapter.isEnabled()) {
-                addProperty(returnObj, keyStatus, statusEnabled);
-
-                pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                pluginResult.setKeepCallback(true);
-                callbackContextInitializeAction[0].sendPluginResult(pluginResult);
-            } else {
-                addProperty(returnObj, keyStatus, statusDisabled);
-                addProperty(returnObj, keyMessage, logNotEnabled);
-
-                pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                pluginResult.setKeepCallback(true);
-                callbackContextInitializeAction[0].sendPluginResult(pluginResult);
-            }
-            return;
+        JSONObject obj = null;
+        if (!isAutoStart) {
+            obj = getArgsObject(args);
         }
-
-        JSONObject obj = getArgsObject(args);
-        if (obj != null && getStatusReceiver(obj)) {
+        if (isAutoStart || obj != null && getStatusReceiver(obj)) {
             //Add a receiver to pick up when Bluetooth state changes
             this.registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
             isReceiverRegistered = true;
         }
 
-        //Get Bluetooth adapter via Bluetooth Manager
         BluetoothManager bluetoothManager = (BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE);
-        bluetoothAdapter = bluetoothManager.getAdapter();
 
+        if (bluetoothAdapter == null) {
+            //Get Bluetooth adapter via Bluetooth Manager
+            assert bluetoothManager != null;
+            bluetoothAdapter = bluetoothManager.getAdapter();
 
-        connections = new HashMap<Object, HashMap<Object, Object>>();
+            connections = new HashMap<Object, HashMap<Object, Object>>();
+        }
 
         returnObj = new JSONObject();
 
         //If it's already enabled,
-        if (bluetoothAdapter.isEnabled() && !isAutoStart) {
-            addProperty(returnObj, keyStatus, statusEnabled);
+        if (bluetoothAdapter.isEnabled()) {
+            //Re-opening Gatt server seems to cause some issues
+            if (gattServer == null) {
+                gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
+
+
+                createAdvertiseCallback(isAutoStart);
+
+                Log.e("BIBA", "AddServiceAction");
+                addServiceAction(service, isAutoStart);
+
+                Log.e("BIBA", "StartAdvertisingAction");
+                startAdvertisingAction(params_advertising, isAutoStart);
+                return;
+            }
+        }
+
+
+        boolean request = true;
+        if (obj != null) {
+            request = getRequest(obj);
+        }
+
+        //Request user to enable Bluetooth надо сделать невидимое активити и там сделать реквест
+        if (request && isAutoStart) {
+            //Request Bluetooth to be enabled
+            Intent dialogIntent = new Intent(this, EnableBluetoothActivity.class);
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(dialogIntent);
+        } else {
+            //No request, so send back not enabled
+            addProperty(returnObj, keyStatus, statusDisabled);
+            addProperty(returnObj, keyMessage, logNotEnabled);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
             pluginResult.setKeepCallback(true);
             callbackContextInitializeAction[0].sendPluginResult(pluginResult);
         }
-
-//        boolean request = false;
-//        if (obj != null) {
-//            request = getRequest(obj);
-//        }
-//
-//        //Request user to enable Bluetooth надо сделать невидимое активити и там сделать реквест
-//        if (request) {
-//            //Request Bluetooth to be enabled
-//            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            cordova.startActivityForResult(this, enableBtIntent, REQUEST_BT_ENABLE);
-//        } else {
-//            //No request, so send back not enabled
-//            addProperty(returnObj, keyStatus, statusDisabled);
-//            addProperty(returnObj, keyMessage, logNotEnabled);
-//            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-//            pluginResult.setKeepCallback(true);
-//            initCallbackContext.sendPluginResult(pluginResult);
-//        }
 
 
         /// ---------------------------------------------------------------
@@ -427,21 +448,6 @@ public class Background extends Service {
             addProperty(returnObj, "message", logOperationUnsupported);
 
             callbackContextInitializeAction[0].error(returnObj);
-            return;
-        }
-
-
-        //Re-opening Gatt server seems to cause some issues
-        if (gattServer == null) {
-            gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
-        }
-        if (!isAutoStart) {
-            returnObj = new JSONObject();
-            addProperty(returnObj, keyStatus, statusEnabled);
-
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-            pluginResult.setKeepCallback(true);
-            callbackContextInitializeAction[0].sendPluginResult(pluginResult);
         }
     }
 
@@ -593,27 +599,7 @@ public class Background extends Service {
             service.addCharacteristic(characteristic);
         }
         boolean result = gattServer.addService(service);
-
-        if (isAutoStart) {
-            return;
-        }
-
-        if (result) {
-            JSONObject returnObj = new JSONObject();
-
-            addProperty(returnObj, "service", uuid.toString());
-            addProperty(returnObj, "status", "serviceAdded");
-
-            callbackContext[0].success(returnObj);
-        } else {
-            JSONObject returnObj = new JSONObject();
-
-            addProperty(returnObj, "service", uuid.toString());
-            addProperty(returnObj, "error", "service");
-            addProperty(returnObj, "message", "Failed to add service");
-
-            callbackContext[0].error(returnObj);
-        }
+        Log.e(TAG, String.valueOf(result));
     }
 
     private void removeServiceAction(JSONArray args, CallbackContext callbackContext) {
@@ -665,13 +651,9 @@ public class Background extends Service {
         callbackContext.success(returnObj);
     }
 
-    private void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
+    protected void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
-        if (!isAutoStart && isNotArgsObject(obj, callbackContext[0])) {
-            return;
-        }
-//        String name = getAdapterName(obj);
-        //set adapter name
+
         bluetoothAdapter.setName(getAdapterName(obj));
 
         BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
@@ -744,11 +726,10 @@ public class Background extends Service {
         dataBuilder.setIncludeTxPowerLevel(obj.optBoolean("includeTxPowerLevel", true));
 
         AdvertiseData advertiseData = dataBuilder.build();
-
         advertiser.startAdvertising(advertiseSettings, advertiseData, advertiseCallback);
     }
 
-    private void stopAdvertisingAction(JSONArray args, CallbackContext callbackContext) {
+    private void stopAdvertisingAction(CallbackContext... callbackContext) {
         BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) {
             JSONObject returnObj = new JSONObject();
@@ -756,7 +737,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "startAdvertising");
             addProperty(returnObj, "message", "Advertising isn't supported");
 
-            callbackContext.error(returnObj);
+            callbackContext[0].error(returnObj);
             return;
         }
 
@@ -764,7 +745,7 @@ public class Background extends Service {
 
         JSONObject returnObj = new JSONObject();
         addProperty(returnObj, "status", "advertisingStopped");
-        callbackContext.success(returnObj);
+        callbackContext[0].success(returnObj);
     }
 
     private void isAdvertisingAction(CallbackContext callbackContext) {
@@ -1099,9 +1080,10 @@ public class Background extends Service {
         advertiseCallback = new AdvertiseCallback() {
             @Override
             public void onStartFailure(int errorCode) {
+                Log.e(TAG, "onStartFailure");
                 isAdvertising = false;
 
-                if (callbackContextStartAdvertisingAction == null)
+                if (callbackContextStartAdvertisingAction == null || !isAutoStart)
                     return;
 
                 JSONObject returnObj = new JSONObject();
@@ -1127,9 +1109,10 @@ public class Background extends Service {
 
             @Override
             public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+                Log.e(TAG, "onStartSuccess");
                 isAdvertising = true;
 
-                if (callbackContextStartAdvertisingAction == null)
+                if (callbackContextStartAdvertisingAction == null || !isAutoStart)
                     return;
 
                 JSONObject returnObj = new JSONObject();
@@ -1162,31 +1145,13 @@ public class Background extends Service {
 
                 switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                     case BluetoothAdapter.STATE_OFF:
-                        if (!isAutoStart) {
-                            addProperty(returnObj, keyStatus, statusDisabled);
-                            addProperty(returnObj, keyMessage, logNotEnabled);
-
-                            connections = new HashMap<Object, HashMap<Object, Object>>();
-
-                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                            pluginResult.setKeepCallback(true);
-                            callbackContextInitializeAction.sendPluginResult(pluginResult);
-                        } else {
-                            android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
-                        }
+                        isAdvertising = false;
+                        android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
                         break;
                     case BluetoothAdapter.STATE_ON:
-                        if (isAutoStart) {
-                            startAdvertisingAction(params_advertising, isAutoStart);
-                            android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
-                        } else {
-                            addProperty(returnObj, keyStatus, statusEnabled);
-
-                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-                            pluginResult.setKeepCallback(true);
-                            callbackContextInitializeAction.sendPluginResult(pluginResult);
-                        }
-
+                        Log.e(TAG, "STATE_ON " + params_advertising);
+                        startAdvertisingAction(params_advertising, isAutoStart);
+                        android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }

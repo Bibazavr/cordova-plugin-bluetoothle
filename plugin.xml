@@ -23,10 +23,15 @@
     <source-file src="src/android/com/randdusing/bluetoothle/Background.java" target-dir="src/com/randdusing/bluetoothle" />
     <source-file src="src/android/com/randdusing/bluetoothle/AutoStartParams.java" target-dir="src/com/randdusing/bluetoothle" />
     <source-file src="src/android/com/randdusing/bluetoothle/Actions.java" target-dir="src/com/randdusing/bluetoothle" />
-    <source-file src="src/android/com/randdusing/bluetoothle/EnableBluetooth.java" target-dir="src/com/randdusing/bluetoothle" />
+    <source-file src="src/android/com/randdusing/bluetoothle/EnableBluetoothActivity.java" target-dir="src/com/randdusing/bluetoothle" />
     <source-file src="src/android/com/randdusing/bluetoothle/Constants.java" target-dir="src/com/randdusing/bluetoothle" />
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <service android:name="com.randdusing.bluetoothle.Background"/>
+      <activity android:name="com.randdusing.bluetoothle.EnableBluetoothActivity" android:launchMode="singleInstance"
+                android:taskAffinity=""
+                android:autoRemoveFromRecents="true"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+      </activity>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.BLUETOOTH"/>

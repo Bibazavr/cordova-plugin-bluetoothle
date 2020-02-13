@@ -413,7 +413,7 @@ public class BluetoothLePlugin extends CordovaPlugin {
     } else if ("startAdvertising".equals(action)) {
       startAdvertisingAction(args, callbackContext);
     } else if ("stopAdvertising".equals(action)) {
-      stopAdvertisingAction(args, callbackContext);
+      stopAdvertisingAction(callbackContext);
     } else if ("isAdvertising".equals(action)) {
       isAdvertisingAction(callbackContext);
     } else if ("respond".equals(action)) {
@@ -523,11 +523,9 @@ public class BluetoothLePlugin extends CordovaPlugin {
 
 
   static CallbackContext callbackContextStopAdvertisingAction;
-  static JSONArray argsStopAdvertisingAction;
 
-  private void stopAdvertisingAction(JSONArray args, CallbackContext callbackContext) {
+  private void stopAdvertisingAction(CallbackContext callbackContext) {
     callbackContextStopAdvertisingAction = callbackContext;
-    argsStopAdvertisingAction = args;
 
     Context context = cordova.getActivity().getApplicationContext();
     Intent intent = new Intent(context, Background.class);
