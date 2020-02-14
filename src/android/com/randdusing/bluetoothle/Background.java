@@ -108,6 +108,7 @@ public class Background extends Service {
     static BluetoothAdapter bluetoothAdapter;
     private static boolean isReceiverRegistered = false;
     private static boolean isBondReceiverRegistered = false;
+    private static boolean isServiceAdded = false;
     static boolean isAutoStart = false;
 
     //General callback variables
@@ -599,6 +600,7 @@ public class Background extends Service {
             service.addCharacteristic(characteristic);
         }
         boolean result = gattServer.addService(service);
+        isServiceAdded = result;
         Log.e(TAG, String.valueOf(result));
     }
 
@@ -1150,6 +1152,9 @@ public class Background extends Service {
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.e(TAG, "STATE_ON " + params_advertising);
+                        if (!isServiceAdded){
+                            addServiceAction(service, isAutoStart);
+                        }
                         startAdvertisingAction(params_advertising, isAutoStart);
                         android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
                         break;
