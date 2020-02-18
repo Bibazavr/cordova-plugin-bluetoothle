@@ -1,102 +1,40 @@
 package com.randdusing.bluetoothle;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.Service;
+import android.bluetooth.*;
+import android.bluetooth.le.*;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
+import android.os.IBinder;
+import android.os.ParcelUuid;
+import android.util.Base64;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.core.app.NotificationCompat;
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Service;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.NotificationChannel;
-
-import androidx.core.app.NotificationCompat;
+import java.util.*;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
-//----------------------------------------Biba imports----------------------------------------------------------------//
-import static com.randdusing.bluetoothle.AutoStartParams.init;
-import static com.randdusing.bluetoothle.AutoStartParams.service;
-import static com.randdusing.bluetoothle.AutoStartParams.params_advertising;
-
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsAddServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsInitializeAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsIsBondedAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsNotifyAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRemoveAllServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRemoveServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsRespondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsStartAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsUnBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.argsDisconnectAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextAddServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextGetAdapterInfoAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextInitializeAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextIsAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextIsBondedAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextNotifyAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextRemoveAllServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextRemoveServiceAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextRespondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextStartAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextStopAdvertisingAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextUnBondAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextEnableAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisableAction;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.callbackContextDisconnectAction;
 import static com.randdusing.bluetoothle.Actions.*;
+import static com.randdusing.bluetoothle.AutoStartParams.*;
+import static com.randdusing.bluetoothle.BluetoothLePlugin.*;
 import static com.randdusing.bluetoothle.Constants.*;
 
+//----------------------------------------Biba imports----------------------------------------------------------------//
 //-----------------------------------------Biba imports end-----------------------------------------------------------//
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
-
-import android.os.IBinder;
-import android.os.Handler;
-import android.os.Build;
-import android.os.ParcelUuid;
-
-import android.util.Base64;
-import android.widget.Toast;
-
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.Arrays;
-
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothGattServer;
-import android.bluetooth.BluetoothGattServerCallback;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
-import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseData;
-import android.bluetooth.le.AdvertiseSettings;
-import android.bluetooth.le.BluetoothLeAdvertiser;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanSettings;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanCallback;
-
-
+@SuppressWarnings("unchecked")
 public class Background extends Service {
     private static String TAG = "Background";
     private static final int ID_SERVICE = 300;
@@ -405,9 +343,9 @@ public class Background extends Service {
             if (gattServer == null) {
                 gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
 
-
-                createAdvertiseCallback(isAutoStart);
-
+                if (advertiseCallback == null) {
+                    createAdvertiseCallback(isAutoStart);
+                }
                 Log.e("BIBA", "AddServiceAction");
                 addServiceAction(service, isAutoStart);
 
@@ -1152,9 +1090,20 @@ public class Background extends Service {
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.e(TAG, "STATE_ON " + params_advertising);
-                        if (!isServiceAdded){
+
+                        BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+                        if (gattServer == null) {
+                            gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
+                        }
+                        if (advertiseCallback == null) {
+                            createAdvertiseCallback(isAutoStart);
+                        }
+                        Log.e("BIBA", "AddServiceAction");
+                        if (!isServiceAdded) {
                             addServiceAction(service, isAutoStart);
                         }
+
+                        Log.e("BIBA", "StartAdvertisingAction");
                         startAdvertisingAction(params_advertising, isAutoStart);
                         android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
                         break;
