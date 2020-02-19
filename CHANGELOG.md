@@ -109,7 +109,7 @@
 - Fixed bug with scan race condition [\#223](https://github.com/randdusing/BluetoothLE/issues/223)
 - Fixed bug where unsubscribe wouldn't throw an error when already unsubscribed and subscribe wouldn't throw an error when already subscribed.
 - Fixed bug where error callback was used instead of success callback when the device unexpectedly disconnected. [\#209](https://github.com/randdusing/BluetoothLE/issues/209)
-- Fixed bug where non-BLE devices were returned with retrieveConnected on Android
+- Fixed bug where non-Ble devices were returned with retrieveConnected on Android
 - Added permissions information to Android discovery.
 - Updated and simplified Angular wrapper. Timeouts can now specified for almost any type of operation. Improved its example.
 - Removed example. Use the Angular wrapper's example instead. Keeping both examples up to date was too time consuming.

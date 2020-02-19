@@ -962,7 +962,7 @@ public class Background extends Service {
             Boolean returnValue = (Boolean) mi.invoke(device);
             result = returnValue.booleanValue();
         } catch (Exception e) {
-            Log.d("BLE", e.getMessage());
+            Log.d("Ble", e.getMessage());
         }
 
         if (!result) {
@@ -1884,7 +1884,7 @@ public class Background extends Service {
 
         //TODO implement this later
         public void onExecuteWrite(BluetoothDevice device, int requestId, boolean execute) {
-            //Log.d("BLE", "execute write");
+            //Log.d("Ble", "execute write");
         }
 
         public void onMtuChanged(BluetoothDevice device, int mtu) {

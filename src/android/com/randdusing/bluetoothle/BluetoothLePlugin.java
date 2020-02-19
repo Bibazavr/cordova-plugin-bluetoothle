@@ -1236,7 +1236,7 @@ public class BluetoothLePlugin extends CordovaPlugin {
       }
     }
     catch (Exception localException) {
-      Log.e("BLE", "An exception occured while refreshing device cache");
+      Log.e("Ble", "An exception occured while refreshing device cache");
     }
     return false;
   }

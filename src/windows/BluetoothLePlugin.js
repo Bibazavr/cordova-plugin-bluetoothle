@@ -41,7 +41,7 @@ module.exports = {
             Windows.System.Launcher.launchUriAsync(Windows.Foundation.Uri("ms-settings-bluetooth:"));
           }
         }
-        errorCallback({ error: "initialize", message: "No BLE devices found." });
+        errorCallback({ error: "initialize", message: "No Ble devices found." });
       }
     }, function (error) {
       if (params && params.length > 0 && params[0].request) {
@@ -146,7 +146,7 @@ module.exports = {
   startScan: function (successCallback, errorCallback, params) {
 
     if (!WATCHER) {
-      // watch BLE devices using device watcher.
+      // watch Ble devices using device watcher.
       var selector = WindowsBluetooth.BluetoothLEDevice.getDeviceSelectorFromConnectionStatus(false);
       if (params && params[0] && params[0].isConnectable) {
         selector += ' AND System.Devices.Aep.Bluetooth.Le.IsConnectable:=System.StructuredQueryType.Boolean#True';

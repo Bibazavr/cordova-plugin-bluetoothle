@@ -1,14 +1,39 @@
 declare namespace BluetoothlePlugin {
+    /** Device's status */
+    interface BLEObject {
+        status: Status,
+        /** The address/identifier provided by the scan's return object */
+        address: string,
+        /** Service's UUID */
+        service: string,
+        /** Characteristic UUID */
+        characteristic: string,
+        /** This integer value will be incremented every read/writeRequested */
+        requestId: number,
+        /** Offset value */
+        offset: number,
+        /** mtu value */
+        mtu: number,
+        /** Base64 encoded string of bytes */
+        value: string,
+        /** Для write/read Request */
+        responseNeeded: boolean,
+        /** Имя подключённого*/
+        name: string,
+    }
+
     interface Bluetoothle {
         /**
          * Initialize Bluetooth on the device
          * @param initializeResult  The callback that is passed initialize status (enabled/disabled)
+         * @param initializeError
          * @param params            Init params
          *
          */
         initialize(
-            initializeResult:(result: { status: 'enabled' | 'disabled' }) => void,
-            params?: InitParams): void;
+            initializeResult: (result: BLEObject) => void,
+            initializeError: (result: BLEObject) => void,
+            params: InitParams): void;
 
         /**
          * Enable Bluetooth on the device. Android support only
@@ -18,8 +43,8 @@ declare namespace BluetoothlePlugin {
          *
          */
         enable(
-            enableSuccess:(result: { status: boolean }) => void,
-            enableError:(error: Error) => void): void;
+            enableSuccess: (result: { status: boolean }) => void,
+            enableError: (error: Error) => void): void;
 
         /**
          * Disable Bluetooth on the device. Android support only
@@ -44,7 +69,7 @@ declare namespace BluetoothlePlugin {
          *
          */
         startScan(
-            startScanSuccess:(status: ScanStatus) => void,
+            startScanSuccess: (status: ScanStatus) => void,
             startScanError: (error: Error) => void,
             params?: ScanParams): void;
 
@@ -202,7 +227,7 @@ declare namespace BluetoothlePlugin {
          *
          */
         descriptors(
-            descriptorsSuccess: (descriptors: Descriptors) =>void,
+            descriptorsSuccess: (descriptors: Descriptors) => void,
             descriptorsError: (error: Error) => void,
             params: DescriptorParams): void;
 
@@ -317,7 +342,7 @@ declare namespace BluetoothlePlugin {
             params: { address: string, mtu?: number }): void;
 
         /**
-         * Request a change in the connection priority to improve throughput when transfer large amounts of data via BLE.
+         * Request a change in the connection priority to improve throughput when transfer large amounts of data via Ble.
          * Android support only. iOS will return error.
          * @param success   The success callback that is passed with device object
          * @param error     The callback that will be triggered when request connection priority operation fails
@@ -327,7 +352,7 @@ declare namespace BluetoothlePlugin {
         requestConnectionPriority(
             success: (result: DeviceInfo) => void,
             error: (error: Error) => void,
-            params: { address: string, connectionPriority: ConnectionPriority}): void;
+            params: { address: string, connectionPriority: ConnectionPriority }): void;
 
         /**
          * Determine whether the adapter is initialized. No error callback. Returns true or false
@@ -382,7 +407,7 @@ declare namespace BluetoothlePlugin {
          *
          */
         isConnected(
-            isConnectedSuccess:(result: CurrConnectionStatus) => void,
+            isConnectedSuccess: (result: CurrConnectionStatus) => void,
             isConnectedError: (error: Error) => void,
             params: { address: string }): void;
 
@@ -394,7 +419,7 @@ declare namespace BluetoothlePlugin {
          *
          */
         isDiscovered(
-            isDiscoveredSuccess:(result: DiscoverStatus) => void,
+            isDiscoveredSuccess: (result: DiscoverStatus) => void,
             isDiscoveredError: (error: Error) => void,
             params: { address: string }): void;
 
@@ -434,18 +459,6 @@ declare namespace BluetoothlePlugin {
             requestLocationSuccess: (result: { requestLocation: boolean }) => void,
             requestLocationError: (error: Error) => void): void;
 
-        /**
-         * Initialize Bluetooth on the device. Must be called before anything else.
-         * Callback will continuously be used whenever Bluetooth is enabled or disabled.
-         * @param success   The success callback that is passed with InitializeResult object
-         * @param error     The callback that will be triggered when initializePeripheral operation fails
-         * @param params    Init peripheral params
-         *
-         */
-        initializePeripheral(
-            success: (result: InitializeResult) => void,
-            error: (error: Error) => void,
-            params?: InitPeripheralParams): void;
 
         /**
          * Add a service with characteristics and descriptors. If more than one service is added, add them sequentially
@@ -482,7 +495,7 @@ declare namespace BluetoothlePlugin {
             error: (error: Error) => void): void;
 
         /**
-         * Start advertising as a BLE device. Note: This needs to be improved so services can be used for both Android and iOS.
+         * Start advertising as a Ble device. Note: This needs to be improved so services can be used for both Android and iOS.
          * On iOS, the advertising devices likes to rename itself back to the name of the device, i.e. Rand' iPhone
          * @param success The success callback that is passed with device's status
          * @param error   The callback that will be triggered when startAdvertising operation fails
@@ -490,7 +503,7 @@ declare namespace BluetoothlePlugin {
          *
          */
         startAdvertising(
-            success: (result: { status: Status}) => void,
+            success: (result: { status: Status }) => void,
             error: (error: Error) => void,
             params: AdvertisingParams): void;
 
@@ -567,6 +580,8 @@ declare namespace BluetoothlePlugin {
          * @return          Encoded string
          */
         bytesToString(value: Uint8Array): string;
+
+        getAdapterInfo(param: (getAdapterInfo: object) => void): void;
     }
 
     /* Available status of device */
@@ -574,7 +589,7 @@ declare namespace BluetoothlePlugin {
         | "bonding" | "bonded" | "unbonded" | "closed" | "services" | "discovered"
         | "characteristics" | "descriptors" | "read" | "subscribed" | "unsubscribed"
         | "subscribedResult" | "written" | "readDescriptor" | "writeDescriptor"
-        | "rssi" | "mtu" | "connectionPriorityRequested" |"enabled" | "disabled"
+        | "rssi" | "mtu" | "connectionPriorityRequested" | "enabled" | "disabled"
         | "readRequested" | "writeRequested" | "mtuChanged" | "notifyReady" | "notifySent"
         | "serviceAdded" | "serviceRemoved" | "allServicesRemoved" | "advertisingStarted"
         | "advertisingStopped" | "responded" | "notified";
@@ -589,17 +604,12 @@ declare namespace BluetoothlePlugin {
         service: string
     }
 
-    interface InitPeripheralParams {
-        /** Should user be prompted to enable Bluetooth */
-        request?: boolean,
-        /* A unique string to identify your app. Bluetooth Central background mode is required to use this, but background mode doesn't seem to require specifying the restoreKey */
-        restoreKey?: string
 
-    }
-
-    interface InitParams extends InitPeripheralParams {
+    interface InitParams {
         /** Should change in Bluetooth status notifications be sent */
         statusReceiver?: boolean,
+        "request"?: boolean,
+        "restoreKey"?: string
     }
 
     interface ScanParams {
@@ -647,7 +657,7 @@ declare namespace BluetoothlePlugin {
         characteristic: string
     }
 
-    interface OperationDescriptorParams  extends DescriptorParams {
+    interface OperationDescriptorParams extends DescriptorParams {
         /** The descriptor's ID */
         descriptor: string
     }
@@ -705,7 +715,7 @@ declare namespace BluetoothlePlugin {
         address: string,
     }
 
-    interface DeviceInfo extends CommonInfo{
+    interface DeviceInfo extends CommonInfo {
         /** Device's status */
         status: Status;
     }
@@ -773,7 +783,7 @@ declare namespace BluetoothlePlugin {
         /** Service's uuid */
         uuid: string,
         /** Array of characteristics */
-        characteristics : Characteristic[]
+        characteristics: Characteristic[]
     }
 
     interface Characteristic {
@@ -814,7 +824,7 @@ declare namespace BluetoothlePlugin {
             writeEncryptionRequired?: boolean
         }
     }
-    
+
     interface Descriptor {
         uuid: string;
     }
@@ -865,7 +875,7 @@ declare namespace BluetoothlePlugin {
         characteristics: Characteristic[],
     }
 
-    interface  InitializeResult {
+    interface InitializeResult {
         /** Device's status */
         status: Status,
         /** The address/identifier provided by the scan's return object */

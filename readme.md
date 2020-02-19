@@ -1443,7 +1443,7 @@ bluetoothle.mtu(mtuSuccess, mtuError, params);
 
 
 ### requestConnectionPriority ###
-Request a change in the connection priority to improve throughput when transfer large amounts of data via BLE. Android support only. iOS will return error.
+Request a change in the connection priority to improve throughput when transfer large amounts of data via Ble. Android support only. iOS will return error.
 
 ```javascript
 bluetoothle.requestConnectionPriority(success, error, params);
@@ -1947,7 +1947,7 @@ bluetoothle.removeAllServices(success, error);
 
 
 ### startAdvertising ###
-Start advertising as a BLE device. Note: This needs to be improved so services can be used for both Android and iOS.
+Start advertising as a Ble device. Note: This needs to be improved so services can be used for both Android and iOS.
 On iOS, the advertising devices likes to rename itself back to the name of the device, i.e. Rand' iPhone
 
 ```javascript
