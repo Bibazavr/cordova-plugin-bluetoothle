@@ -31,10 +31,7 @@ import static com.randdusing.bluetoothle.AutoStartParams.*;
 import static com.randdusing.bluetoothle.BluetoothLePlugin.*;
 import static com.randdusing.bluetoothle.Constants.*;
 
-//----------------------------------------Biba imports----------------------------------------------------------------//
-//-----------------------------------------Biba imports end-----------------------------------------------------------//
 
-@SuppressWarnings("unchecked")
 public class Background extends Service {
     private static String TAG = "Background";
     private static final int ID_SERVICE = 300;
@@ -59,6 +56,15 @@ public class Background extends Service {
     //Store bonds
     private static HashMap<String, CallbackContext> bonds = new HashMap<String, CallbackContext>();
 
+    //---------------------------------Возможно для будущего пригодятся-----------------------------------------------//
+    //Quick Writes
+    private LinkedList<byte[]> queueQuick = new LinkedList<byte[]>();
+
+    //Queueing
+    private LinkedList<Operation> queue = new LinkedList<Operation>();
+    //---------------------------------Возможно для будущего пригодятся end--------------------------------------------//
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -74,6 +80,8 @@ public class Background extends Service {
                 .setPriority(PRIORITY_MIN)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build();
+
+        createAdvertiseCallback();
 
         startForeground(ID_SERVICE, notification);
     }
@@ -100,9 +108,7 @@ public class Background extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
 
-
         String action = intent != null ? intent.getAction() : null;
-
 
         if (null == action) {
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
@@ -140,9 +146,6 @@ public class Background extends Service {
                     Log.e("BIBA", "stringInitializeAction");
                     Log.e(TAG, String.valueOf(argsInitializeAction));
                     initialize(argsInitializeAction, isAutoStart, callbackContextInitializeAction);
-                    if (advertiseCallback == null) {
-                        createAdvertiseCallback(isAutoStart);
-                    }
                     break;
                 case stringAddServiceAction:
                     Log.e("BIBA", "stringAddServiceAction");
@@ -343,9 +346,6 @@ public class Background extends Service {
             if (gattServer == null) {
                 gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
 
-                if (advertiseCallback == null) {
-                    createAdvertiseCallback(isAutoStart);
-                }
                 Log.e("BIBA", "AddServiceAction");
                 addServiceAction(service, isAutoStart);
 
@@ -1016,14 +1016,14 @@ public class Background extends Service {
         callbackContext.success(returnObj);
     }
 
-    private void createAdvertiseCallback(Boolean isAutoStart) {
+    private void createAdvertiseCallback() {
         advertiseCallback = new AdvertiseCallback() {
             @Override
             public void onStartFailure(int errorCode) {
                 Log.e(TAG, "onStartFailure");
                 isAdvertising = false;
 
-                if (callbackContextStartAdvertisingAction == null || !isAutoStart)
+                if (callbackContextStartAdvertisingAction == null)
                     return;
 
                 JSONObject returnObj = new JSONObject();
@@ -1052,7 +1052,7 @@ public class Background extends Service {
                 Log.e(TAG, "onStartSuccess");
                 isAdvertising = true;
 
-                if (callbackContextStartAdvertisingAction == null || !isAutoStart)
+                if (callbackContextStartAdvertisingAction == null)
                     return;
 
                 JSONObject returnObj = new JSONObject();
@@ -1094,9 +1094,6 @@ public class Background extends Service {
                         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
                         if (gattServer == null) {
                             gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
-                        }
-                        if (advertiseCallback == null) {
-                            createAdvertiseCallback(isAutoStart);
                         }
                         Log.e("BIBA", "AddServiceAction");
                         if (!isServiceAdded) {

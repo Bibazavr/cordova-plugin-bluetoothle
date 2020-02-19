@@ -8,6 +8,11 @@ public class Constants {
     static final int REQUEST_ACCESS_COARSE_LOCATION = 59628;
     static final int REQUEST_LOCATION_SOURCE_SETTINGS = 59629;
 
+    //Discovery related variables
+    static final int STATE_UNDISCOVERED = 0;
+    static final int STATE_DISCOVERING = 1;
+    static final int STATE_DISCOVERED = 2;
+
     //Object keys
     static final String keyStatus = "status";
     static final String keyError = "error";
