@@ -1,7 +1,7 @@
 let bluetoothleName = "BluetoothLePlugin";
 let bluetoothle = {
-    connectedDevices: function (successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, bluetoothleName, "connectedDevices", []);
+    getConnectedDevices: function (successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, bluetoothleName, "getConnectedDevices", []);
     },
     initialize: function (successCallback, errorCallback, params) {
         cordova.exec(successCallback, errorCallback, bluetoothleName, "initialize", [params]);

@@ -50,6 +50,7 @@ public class Constants {
     static final String keyDiscoveredState = "discoveredState";
     static final String keyConnectionPriority = "connectionPriority";
     static final String keyMtu = "mtu";
+    static final String keyConnectedDevices = "connectedDevice";
 
     //Write Types
     static final String writeTypeNoResponse = "noResponse";
@@ -57,7 +58,6 @@ public class Constants {
     //Status Types
     static final String statusEnabled = "enabled";
     static final String statusDisabled = "disabled";
-    static final String statusScanStarted = "scanStarted";
     static final String statusScanStopped = "scanStopped";
     static final String statusScanResult = "scanResult";
     static final String statusBonded = "bonded";

@@ -582,6 +582,11 @@ declare namespace BluetoothlePlugin {
         bytesToString(value: Uint8Array): string;
 
         getAdapterInfo(param: (getAdapterInfo: object) => void): void;
+
+        getConnectedDevices(
+            success: (result: { connectedDevices: string }) => void,
+            error: (error: { connectedDevices: string }) => void,
+        ): void;
     }
 
     /* Available status of device */

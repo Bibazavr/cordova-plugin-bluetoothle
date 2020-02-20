@@ -25,18 +25,20 @@ public class BluetoothLePlugin extends CordovaPlugin {
             initializeAction(args, callbackContext);
         } else if ("enable".equals(action)) {
             enableAction(callbackContext);
-        } else if ("getAdapterInfo".equals(action)) {
-            getAdapterInfoAction(callbackContext);
         } else if ("disable".equals(action)) {
             disableAction(callbackContext);
+        } else if ("getConnectedDevices".equals(action)) {
+            getConnectedDevices(args, callbackContext);
+        } else if ("getAdapterInfo".equals(action)) {
+            getAdapterInfoAction(callbackContext);
         } else if ("bond".equals(action)) {
             bondAction(args, callbackContext);
         } else if ("unbond".equals(action)) {
             unbondAction(args, callbackContext);
-        } else if ("disconnect".equals(action)) {
-            disconnectAction(args, callbackContext);
         } else if ("isBonded".equals(action)) {
             isBondedAction(args, callbackContext);
+        } else if ("disconnect".equals(action)) {
+            disconnectAction(args, callbackContext);
         } else if ("addService".equals(action)) {
             addServiceAction(args, callbackContext);
         } else if ("removeService".equals(action)) {
@@ -59,6 +61,23 @@ public class BluetoothLePlugin extends CordovaPlugin {
         return true;
     }
 
+    static CallbackContext callbackContextGetConnectedDevices;
+
+    private void getConnectedDevices(JSONArray args, CallbackContext callbackContext) {
+        callbackContextGetConnectedDevices = callbackContext;
+
+        Context context = cordova.getActivity().getApplicationContext();
+        Intent intent = new Intent(context, Background.class);
+        intent.setAction(stringGetConnectedDevices);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    ;
 
     static CallbackContext callbackContextInitializeAction;
     static JSONArray argsInitializeAction;

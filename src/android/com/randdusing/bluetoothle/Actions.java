@@ -4,6 +4,8 @@ public class Actions {
     static final String stringInitializeAction = "com.randdusing.bluetoothle.INITIALIZE";
     static final String stringGetAdapterInfoAction = "com.randdusing.bluetoothle.GET_ADAPTER_INFO";
 
+    static final String stringGetConnectedDevices = "com.randdusing.bluetoothle.GET_CONNECTED_DEVICES";
+
     static final String stringAddServiceAction = "com.randdusing.bluetoothle.ADD_SERVICE";
     static final String stringRemoveServiceAction = "com.randdusing.bluetoothle.REMOVE_SERVICE";
     static final String stringRemoveAllServiceAction = "com.randdusing.bluetoothle.REMOVE_ALL_SERVICE";
