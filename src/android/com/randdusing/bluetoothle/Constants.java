@@ -50,7 +50,7 @@ public class Constants {
     static final String keyDiscoveredState = "discoveredState";
     static final String keyConnectionPriority = "connectionPriority";
     static final String keyMtu = "mtu";
-    static final String keyConnectedDevices = "connectedDevice";
+    static final String keyConnectedDevices = "connectedDevices";
 
     //Write Types
     static final String writeTypeNoResponse = "noResponse";
