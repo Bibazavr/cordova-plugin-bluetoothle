@@ -1003,55 +1003,14 @@ public class Background extends Service {
     }
 
     private void disconnectAction(JSONArray args, CallbackContext callbackContext) {
-        if (isNotInitialized(callbackContext, true)) {
-            return;
+        Log.e("BIBA", "disconnectAction");
+        BluetoothManager bluetoothManager = (BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE);
+        assert bluetoothManager != null;
+        List<BluetoothDevice> connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT_SERVER);
+        for (BluetoothDevice connectedDevice : connectedDevices) {
+            gattServer.cancelConnection(connectedDevice);
+            Log.e("BIBA", String.format("cancelConnection %s", connectedDevice));
         }
-
-        JSONObject obj = getArgsObject(args);
-        if (isNotArgsObject(obj, callbackContext)) {
-            return;
-        }
-
-        String address = getAddress(obj);
-        if (isNotAddress(address, callbackContext)) {
-            return;
-        }
-
-        HashMap<Object, Object> connection = wasNeverConnected(address, callbackContext);
-        if (connection == null) {
-            return;
-        }
-
-        BluetoothGatt bluetoothGatt = (BluetoothGatt) connection.get(keyPeripheral);
-        BluetoothDevice device = bluetoothGatt.getDevice();
-
-        if (isDisconnected(connection, device, callbackContext)) {
-            return;
-        }
-
-        int state = Integer.valueOf(connection.get(keyState).toString());
-
-        JSONObject returnObj = new JSONObject();
-
-        //Return disconnecting status and keep callback
-        addDevice(returnObj, device);
-
-        //If it's connecting, cancel attempt and return disconnect
-        if (state == BluetoothProfile.STATE_CONNECTING) {
-            addProperty(returnObj, keyStatus, statusDisconnected);
-            connection.put(keyState, BluetoothProfile.STATE_DISCONNECTED);
-
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
-            pluginResult.setKeepCallback(false);
-            callbackContext.sendPluginResult(pluginResult);
-
-            connection.remove(operationConnect);
-        } else {
-            //Very unlikely that this is DISCONNECTING
-            connection.put(operationConnect, callbackContext);
-        }
-
-        bluetoothGatt.disconnect();
     }
 
     private void createAdvertiseCallback() {
