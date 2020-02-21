@@ -1380,7 +1380,6 @@ public class Background extends Service {
         return null;
     }
 
-
     private static void addDevice(JSONObject returnObj, BluetoothDevice device) {
         addProperty(returnObj, keyAddress, device.getAddress());
         addProperty(returnObj, keyName, device.getName());
