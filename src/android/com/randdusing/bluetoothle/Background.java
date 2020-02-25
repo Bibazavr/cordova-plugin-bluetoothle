@@ -283,7 +283,7 @@ public class Background extends Service {
         }
 
         //Request user to enable Bluetooth надо сделать невидимое активити и там сделать реквест
-        if (request && isAutoStart) {
+        if (request) {
             //Request Bluetooth to be enabled
             Intent dialogIntent = new Intent(this, EnableBluetoothActivity.class);
             dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
