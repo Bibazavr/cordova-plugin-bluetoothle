@@ -1084,18 +1084,17 @@ public class Background extends Service {
                     case BluetoothAdapter.STATE_OFF:
                         isAdvertising = false;
                         android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
+                        gattServer.clearServices();
+                        gattServer.close();
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.e(TAG, "STATE_ON " + params_advertising);
 
                         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-                        if (gattServer == null) {
-                            gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
-                        }
+                        gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
+
                         Log.e("BIBA", "AddServiceAction");
-                        if (!isServiceAdded) {
-                            addServiceAction(service, isAutoStart);
-                        }
+                        addServiceAction(service, isAutoStart);
 
                         Log.e("BIBA", "StartAdvertisingAction");
                         startAdvertisingAction(params_advertising, isAutoStart);
