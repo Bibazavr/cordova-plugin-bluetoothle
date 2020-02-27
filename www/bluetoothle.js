@@ -1,5 +1,5 @@
-let bluetoothleName = "BluetoothLePlugin";
-let bluetoothle = {
+var bluetoothleName = "BluetoothLePlugin";
+var bluetoothle = {
     getConnectedDevices: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, bluetoothleName, "getConnectedDevices", []);
     },
@@ -52,9 +52,9 @@ let bluetoothle = {
         cordova.exec(successCallback, errorCallback, bluetoothleName, "notify", [params]);
     },
     encodedStringToBytes: function (string) {
-        let data = atob(string);
-        let bytes = new Uint8Array(data.length);
-        for (let i = 0; i < bytes.length; i++) {
+        var data = atob(string);
+        var bytes = new Uint8Array(data.length);
+        for (var i = 0; i < bytes.length; i++) {
             bytes[i] = data.charCodeAt(i);
         }
         return bytes;
@@ -63,9 +63,9 @@ let bluetoothle = {
         return btoa(String.fromCharCode.apply(null, bytes));
     },
     stringToBytes: function (string) {
-        let bytes = new ArrayBuffer(string.length * 2);
-        let bytesUint16 = new Uint16Array(bytes);
-        for (let i = 0; i < string.length; i++) {
+        var bytes = new ArrayBuffer(string.length * 2);
+        var bytesUint16 = new Uint16Array(bytes);
+        for (var i = 0; i < string.length; i++) {
             bytesUint16[i] = string.charCodeAt(i);
         }
         return new Uint8Array(bytesUint16);
@@ -74,8 +74,8 @@ let bluetoothle = {
         return String.fromCharCode.apply(null, new Uint16Array(bytes));
     },
     bytesToHex: function (bytes) {
-        let string = [];
-        for (let i = 0; i < bytes.length; i++) {
+        var string = [];
+        for (var i = 0; i < bytes.length; i++) {
             string.push("0x" + ("0" + (bytes[i].toString(16))).substr(-2).toUpperCase());
         }
         return string.join(" ");
