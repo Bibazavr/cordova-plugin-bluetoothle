@@ -1,4 +1,4 @@
-package com.randdusing.bluetoothle;
+package com.microline.bluetoothle;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -26,10 +26,10 @@ import org.json.JSONObject;
 import java.util.*;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
-import static com.randdusing.bluetoothle.Actions.*;
-import static com.randdusing.bluetoothle.AutoStartParams.*;
-import static com.randdusing.bluetoothle.BluetoothLePlugin.*;
-import static com.randdusing.bluetoothle.Constants.*;
+import static com.microline.bluetoothle.Actions.*;
+import static com.microline.bluetoothle.AutoStartParams.*;
+import static com.microline.bluetoothle.BluetoothLePlugin.*;
+import static com.microline.bluetoothle.Constants.*;
 
 
 public class Background extends Service {

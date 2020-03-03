@@ -1,4 +1,4 @@
-package com.randdusing.bluetoothle;
+package com.microline.bluetoothle;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -12,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 
-import static com.randdusing.bluetoothle.Actions.*;
+import static com.microline.bluetoothle.Actions.*;
 
 public class BluetoothLePlugin extends CordovaPlugin {
     public BluetoothLePlugin() {

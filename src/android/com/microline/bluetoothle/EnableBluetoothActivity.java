@@ -1,20 +1,17 @@
-package com.randdusing.bluetoothle;
+package com.microline.bluetoothle;
 
 import android.bluetooth.BluetoothAdapter;
 import android.util.Log;
 import android.widget.Toast;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 
-import static com.randdusing.bluetoothle.Actions.stringBluetoothOnAction;
-import static com.randdusing.bluetoothle.Background.*;
+import static com.microline.bluetoothle.Actions.stringBluetoothOnAction;
+import static com.microline.bluetoothle.Background.*;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import static com.randdusing.bluetoothle.Constants.*;
+import static com.microline.bluetoothle.Constants.*;
 
 public class EnableBluetoothActivity extends Activity {
     private static String TAG = "EnableBluetooth";
