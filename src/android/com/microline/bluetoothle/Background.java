@@ -615,7 +615,10 @@ public class Background extends Service {
     protected void startAdvertisingAction(JSONArray args, Boolean isAutoStart, CallbackContext... callbackContext) {
         JSONObject obj = getArgsObject(args);
 
-        bluetoothAdapter.setName(getAdapterName(obj));
+        assert obj != null;
+        if (obj.optBoolean("includeDeviceName", false)) {
+            bluetoothAdapter.setName(getAdapterName(obj));
+        }
 
         BluetoothLeAdvertiser advertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (advertiser == null || !bluetoothAdapter.isMultipleAdvertisementSupported()) {
