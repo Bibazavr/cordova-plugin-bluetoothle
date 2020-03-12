@@ -682,7 +682,7 @@ public class Background extends Service {
             dataBuilder.addServiceUuid(new ParcelUuid(uuid));
         }
 
-        dataBuilder.setIncludeDeviceName(obj.optBoolean("includeDeviceName", true));
+        dataBuilder.setIncludeDeviceName(obj.optBoolean("includeDeviceName", false));
 
         dataBuilder.setIncludeTxPowerLevel(obj.optBoolean("includeTxPowerLevel", true));
 
