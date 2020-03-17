@@ -1091,6 +1091,15 @@ public class Background extends Service {
                         android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
                         gattServer.clearServices();
                         gattServer.close();
+
+                        if (callbackContextInitializeAction != null) {
+                            addProperty(returnObj, "status", "disabled");
+                            addProperty(returnObj, "message", "Bluetooth powered off");
+
+                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                            pluginResult.setKeepCallback(true);
+                            callbackContextInitializeAction.sendPluginResult(pluginResult);
+                        }
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.e(TAG, "STATE_ON " + params_advertising);
@@ -1104,6 +1113,15 @@ public class Background extends Service {
                         Log.e("BIBA", "StartAdvertisingAction");
                         startAdvertisingAction(params_advertising, isAutoStart);
                         android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
+
+                        if (callbackContextInitializeAction != null) {
+                            addProperty(returnObj, "status", "enabled");
+                            addProperty(returnObj, "message", "Bluetooth powered on");
+
+                            pluginResult = new PluginResult(PluginResult.Status.OK, returnObj);
+                            pluginResult.setKeepCallback(true);
+                            callbackContextInitializeAction.sendPluginResult(pluginResult);
+                        }
                         break;
                 }
             }
