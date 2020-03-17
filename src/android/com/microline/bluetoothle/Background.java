@@ -802,12 +802,14 @@ public class Background extends Service {
 
         //Wait for onNotificationSent event
         boolean result = gattServer.notifyCharacteristicChanged(device, characteristic, isIndicate);
+        JSONObject returnObj = new JSONObject();
+        addProperty(returnObj, "status", "notify");
         if (!result) {
-            JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "notify");
-            addProperty(returnObj, "message", "Failed to notify");
-            callbackContext.error(returnObj);
+            addProperty(returnObj, "sent", false);
+        } else {
+            addProperty(returnObj, "sent", true);
         }
+        callbackContext.success(returnObj);
     }
 
     private void bondAction(JSONArray args, CallbackContext callbackContext) {
