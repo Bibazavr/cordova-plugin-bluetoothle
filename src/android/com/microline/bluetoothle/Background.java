@@ -1,9 +1,6 @@
 package com.microline.bluetoothle;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
+import android.app.*;
 import android.bluetooth.*;
 import android.bluetooth.le.*;
 import android.content.BroadcastReceiver;
@@ -73,15 +70,10 @@ public class Background extends Service {
 
         // do stuff like register for BroadcastReceiver, etc.
         // Create the Foreground Service
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        String channelId = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? createNotificationChannel(notificationManager) : "";
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
-        Notification notification = notificationBuilder.setOngoing(true)
-                .setPriority(PRIORITY_MIN)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                .build();
 
         createAdvertiseCallback();
+
+        Notification notification = createNotification("ZONT Метка активна");
 
         startForeground(ID_SERVICE, notification);
     }
@@ -95,6 +87,32 @@ public class Background extends Service {
         channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         notificationManager.createNotificationChannel(channel);
         return channelId;
+    }
+
+    private Notification createNotification(String text) {
+        Log.e("BIBA", String.format("createNotification %s", text));
+        Intent resultIntent = new Intent(this, com.microline.bluetoothle.MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        assert notificationManager != null;
+        String channelId = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? createNotificationChannel(notificationManager) : "";
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
+        return notificationBuilder.setOngoing(true)
+                .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
+                .setContentText(text)
+                .setShowWhen(false)
+                .setPriority(PRIORITY_MIN)
+                .setContentIntent(resultPendingIntent)
+                .build();
+    }
+
+    private void updateNotification(Notification notification) {
+        Log.e("BIBA", "updateNotification");
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        startForeground(ID_SERVICE, notification);
     }
 
     @Override
@@ -115,7 +133,6 @@ public class Background extends Service {
 
             Log.e(TAG, "InitializeAction");
             initialize(init, isAutoStart);
-
 
         } else {
             isAutoStart = false;
@@ -1077,16 +1094,14 @@ public class Background extends Service {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (callbackContextInitializeAction == null && !isAutoStart) {
-                return;
-            }
-
             if (intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 JSONObject returnObj = new JSONObject();
                 PluginResult pluginResult;
 
                 switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                     case BluetoothAdapter.STATE_OFF:
+                        updateNotification(createNotification("ZONT Mетка не активна. Включите bluetooth"));
+
                         isAdvertising = false;
                         android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
                         gattServer.clearServices();
@@ -1104,6 +1119,8 @@ public class Background extends Service {
                     case BluetoothAdapter.STATE_ON:
                         Log.e(TAG, "STATE_ON " + params_advertising);
 
+                        updateNotification(createNotification("ZONT Mетка активна"));
+
                         BluetoothManager bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
                         gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
 
@@ -1113,6 +1130,7 @@ public class Background extends Service {
                         Log.e("BIBA", "StartAdvertisingAction");
                         startAdvertisingAction(params_advertising, isAutoStart);
                         android.widget.Toast.makeText(context, "ZONT Метка снова активна", Toast.LENGTH_SHORT).show();
+
 
                         if (callbackContextInitializeAction != null) {
                             addProperty(returnObj, "status", "enabled");
