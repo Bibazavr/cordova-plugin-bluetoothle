@@ -1100,7 +1100,7 @@ public class Background extends Service {
 
                 switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)) {
                     case BluetoothAdapter.STATE_OFF:
-                        updateNotification(createNotification("ZONT Mетка не активна. Включите bluetooth"));
+                        updateNotification(createNotification("ZONT Mетка не активна. Включите Bluetooth."));
 
                         isAdvertising = false;
                         android.widget.Toast.makeText(context, "Включите Bluetooth, чтобы ZONT Метка заработала", Toast.LENGTH_SHORT).show();
