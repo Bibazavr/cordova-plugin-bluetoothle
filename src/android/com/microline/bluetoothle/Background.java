@@ -65,7 +65,6 @@ public class Background extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "onCreate", Toast.LENGTH_LONG).show();
         Log.e(TAG, "onCreate");
 
         // do stuff like register for BroadcastReceiver, etc.
@@ -127,6 +126,10 @@ public class Background extends Service {
         String action = intent != null ? intent.getAction() : null;
 
         if (null == action) {
+            Notification notification = createNotification("ZONT Метка активна");
+
+            startForeground(ID_SERVICE, notification);
+
             Toast.makeText(this, "ZONT Метка запустилась.", Toast.LENGTH_LONG).show();
             Log.e(TAG, "AutoAction");
             isAutoStart = true;
