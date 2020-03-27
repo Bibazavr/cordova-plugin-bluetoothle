@@ -1,4 +1,4 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 public class Actions {
     static final String stringInitializeAction = "com.microline.bluetoothle.INITIALIZE";

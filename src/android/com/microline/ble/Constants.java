@@ -1,4 +1,4 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 import java.util.UUID;
 

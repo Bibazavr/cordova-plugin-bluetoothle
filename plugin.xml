@@ -15,19 +15,19 @@
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="BluetoothLePlugin">
-        <param name="android-package" value="com.microline.bluetoothle.BluetoothLePlugin" />
+        <param name="android-package" value="com.microline.ble.BluetoothLePlugin" />
       </feature>
     </config-file>
-    <source-file src="src/android/com/microline/bluetoothle/BluetoothLePlugin.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/Operation.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/Background.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/AutoStartParams.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/Actions.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/EnableBluetoothActivity.java" target-dir="src/com/microline/bluetoothle" />
-    <source-file src="src/android/com/microline/bluetoothle/Constants.java" target-dir="src/com/microline/bluetoothle" />
+    <source-file src="src/android/com/microline/ble/BluetoothLePlugin.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/Operation.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/Background.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/AutoStartParams.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/Actions.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/EnableBluetoothActivity.java" target-dir="src/com/microline/ble" />
+    <source-file src="src/android/com/microline/ble/Constants.java" target-dir="src/com/microline/ble" />
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <service android:name="com.microline.bluetoothle.Background"/>
-      <activity android:name="com.microline.bluetoothle.EnableBluetoothActivity" android:launchMode="singleInstance"
+      <service android:name="com.microline.ble.Background"/>
+      <activity android:name="com.microline.ble.EnableBluetoothActivity" android:launchMode="singleInstance"
                 android:taskAffinity=""
                 android:autoRemoveFromRecents="true"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar">

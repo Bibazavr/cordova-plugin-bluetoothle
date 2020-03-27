@@ -1,4 +1,4 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;

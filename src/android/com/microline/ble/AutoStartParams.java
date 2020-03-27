@@ -1,4 +1,4 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 import org.json.JSONArray;
 import org.json.JSONException;

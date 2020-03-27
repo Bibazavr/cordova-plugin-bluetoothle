@@ -1,17 +1,17 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 import android.bluetooth.BluetoothAdapter;
 import android.util.Log;
 import android.widget.Toast;
 
-import static com.microline.bluetoothle.Actions.stringBluetoothOnAction;
-import static com.microline.bluetoothle.Background.*;
+import static com.microline.ble.Actions.stringBluetoothOnAction;
+import static com.microline.ble.Background.*;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import static com.microline.bluetoothle.Constants.*;
+import static com.microline.ble.Constants.*;
 
 public class EnableBluetoothActivity extends Activity {
     private static String TAG = "EnableBluetooth";

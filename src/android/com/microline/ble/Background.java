@@ -1,4 +1,4 @@
-package com.microline.bluetoothle;
+package com.microline.ble;
 
 import android.app.*;
 import android.bluetooth.*;
@@ -23,10 +23,10 @@ import org.json.JSONObject;
 import java.util.*;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
-import static com.microline.bluetoothle.Actions.*;
-import static com.microline.bluetoothle.AutoStartParams.*;
-import static com.microline.bluetoothle.BluetoothLePlugin.*;
-import static com.microline.bluetoothle.Constants.*;
+import static com.microline.ble.Actions.*;
+import static com.microline.ble.AutoStartParams.*;
+import static com.microline.ble.BluetoothLePlugin.*;
+import static com.microline.ble.Constants.*;
 
 
 public class Background extends Service {
@@ -90,7 +90,7 @@ public class Background extends Service {
 
     private Notification createNotification(String text) {
         Log.e("BIBA", String.format("createNotification %s", text));
-        Intent resultIntent = new Intent(this, com.microline.bluetoothle.MainActivity.class);
+        Intent resultIntent = new Intent(this, com.microline.ble.MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
