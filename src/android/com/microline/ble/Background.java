@@ -784,6 +784,12 @@ public class Background extends Service {
             return;
         }
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+        if (device == null){
+            JSONObject returnObj = new JSONObject();
+            addProperty(returnObj, "error", "notify");
+            addProperty(returnObj, "message", "От тебя отключились device==null!!!");
+            callbackContext.error(returnObj);
+        }
 
         UUID serviceUuid = getUUID(obj.optString("service", null));
         BluetoothGattService service = gattServer.getService(serviceUuid);
