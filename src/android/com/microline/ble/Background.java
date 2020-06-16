@@ -1428,6 +1428,9 @@ public class Background extends Service {
     }
 
     private static JSONObject getArgsObject(JSONArray args) {
+        if (args == null){
+            return null;
+        }
         if (args.length() == 1) {
             try {
                 return args.getJSONObject(0);
@@ -1435,7 +1438,6 @@ public class Background extends Service {
                 ex.printStackTrace();
             }
         }
-
         return null;
     }
 
