@@ -796,6 +796,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "notify");
             addProperty(returnObj, "message", "От тебя отключились device==null!!!");
             callbackContext.error(returnObj);
+            return;
         }
 
         UUID serviceUuid = getUUID(obj.optString("service", null));
@@ -805,6 +806,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "service");
             addProperty(returnObj, "message", "Service not found");
             callbackContext.error(returnObj);
+            return;
         }
 
         UUID characteristicUuid = getUUID(obj.optString("characteristic", null));
@@ -814,6 +816,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "characteristic");
             addProperty(returnObj, "message", "Characteristic not found");
             callbackContext.error(returnObj);
+            return;
         }
 
         byte[] value = getPropertyBytes(obj, "value");
@@ -823,6 +826,7 @@ public class Background extends Service {
             addProperty(returnObj, "error", "respond");
             addProperty(returnObj, "message", "Failed to set value");
             callbackContext.error(returnObj);
+            return;
         }
 
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(clientConfigurationDescriptorUuid);
@@ -1288,17 +1292,18 @@ public class Background extends Service {
     }
 
     private static boolean isNotArgsObject(JSONObject obj, CallbackContext callbackContext) {
-        if (obj != null || callbackContext == null) {
+        if (obj != null) {
             return false;
         }
 
-        JSONObject returnObj = new JSONObject();
+        if (callbackContext != null) {
+            JSONObject returnObj = new JSONObject();
 
-        addProperty(returnObj, keyError, errorArguments);
-        addProperty(returnObj, keyMessage, logNoArgObj);
+            addProperty(returnObj, keyError, errorArguments);
+            addProperty(returnObj, keyMessage, logNoArgObj);
 
-        callbackContext.error(returnObj);
-
+            callbackContext.error(returnObj);
+        }
         return true;
     }
 
