@@ -783,8 +783,15 @@ public class Background extends Service {
         if (isNotAddress(address, callbackContext)) {
             return;
         }
+        if (bluetoothAdapter == null || bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
+            JSONObject returnObj = new JSONObject();
+            addProperty(returnObj, "error", "notify");
+            addProperty(returnObj, "message", "У тебя выключен Bluetooth!!!");
+            callbackContext.error(returnObj);
+            return;
+        }
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-        if (device == null){
+        if (device == null) {
             JSONObject returnObj = new JSONObject();
             addProperty(returnObj, "error", "notify");
             addProperty(returnObj, "message", "От тебя отключились device==null!!!");
@@ -1281,7 +1288,7 @@ public class Background extends Service {
     }
 
     private static boolean isNotArgsObject(JSONObject obj, CallbackContext callbackContext) {
-        if (obj != null) {
+        if (obj != null || callbackContext == null) {
             return false;
         }
 
@@ -1428,7 +1435,7 @@ public class Background extends Service {
     }
 
     private static JSONObject getArgsObject(JSONArray args) {
-        if (args == null){
+        if (args == null) {
             return null;
         }
         if (args.length() == 1) {
