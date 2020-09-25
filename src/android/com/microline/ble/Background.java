@@ -783,70 +783,74 @@ public class Background extends Service {
         if (isNotAddress(address, callbackContext)) {
             return;
         }
-        if (bluetoothAdapter == null || bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
+        try {
+            if (bluetoothAdapter == null || bluetoothAdapter.getState() != BluetoothAdapter.STATE_ON) {
+                JSONObject returnObj = new JSONObject();
+                addProperty(returnObj, "error", "notify");
+                addProperty(returnObj, "message", "У тебя выключен Bluetooth!!!");
+                callbackContext.error(returnObj);
+                return;
+            }
+            BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+            if (device == null) {
+                JSONObject returnObj = new JSONObject();
+                addProperty(returnObj, "error", "notify");
+                addProperty(returnObj, "message", "От тебя отключились device==null!!!");
+                callbackContext.error(returnObj);
+                return;
+            }
+
+            UUID serviceUuid = getUUID(obj.optString("service", null));
+            BluetoothGattService service = gattServer.getService(serviceUuid);
+            if (service == null) {
+                JSONObject returnObj = new JSONObject();
+                addProperty(returnObj, "error", "service");
+                addProperty(returnObj, "message", "Service not found");
+                callbackContext.error(returnObj);
+                return;
+            }
+
+            UUID characteristicUuid = getUUID(obj.optString("characteristic", null));
+            BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUuid);
+            if (characteristic == null) {
+                JSONObject returnObj = new JSONObject();
+                addProperty(returnObj, "error", "characteristic");
+                addProperty(returnObj, "message", "Characteristic not found");
+                callbackContext.error(returnObj);
+                return;
+            }
+
+            byte[] value = getPropertyBytes(obj, "value");
+            boolean setResult = characteristic.setValue(value);
+            if (!setResult) {
+                JSONObject returnObj = new JSONObject();
+                addProperty(returnObj, "error", "respond");
+                addProperty(returnObj, "message", "Failed to set value");
+                callbackContext.error(returnObj);
+                return;
+            }
+
+            BluetoothGattDescriptor descriptor = characteristic.getDescriptor(clientConfigurationDescriptorUuid);
+            byte[] descriptorValue = descriptor.getValue();
+
+            boolean isIndicate = false;
+            if (Arrays.equals(descriptorValue, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)) {
+                isIndicate = true;
+            }
+
+            //Wait for onNotificationSent event
+            boolean result = gattServer.notifyCharacteristicChanged(device, characteristic, isIndicate);
             JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "notify");
-            addProperty(returnObj, "message", "У тебя выключен Bluetooth!!!");
-            callbackContext.error(returnObj);
-            return;
+            addProperty(returnObj, "status", "notify");
+            if (!result) {
+                addProperty(returnObj, "sent", false);
+            } else {
+                addProperty(returnObj, "sent", true);
+            }
+            callbackContext.success(returnObj);
+        } catch (Exception error) {
+            Log.e("BIBA", String.format("ЭТО СЛУЧИЛОСЬ!!! %s", error));
         }
-        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-        if (device == null) {
-            JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "notify");
-            addProperty(returnObj, "message", "От тебя отключились device==null!!!");
-            callbackContext.error(returnObj);
-            return;
-        }
-
-        UUID serviceUuid = getUUID(obj.optString("service", null));
-        BluetoothGattService service = gattServer.getService(serviceUuid);
-        if (service == null) {
-            JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "service");
-            addProperty(returnObj, "message", "Service not found");
-            callbackContext.error(returnObj);
-            return;
-        }
-
-        UUID characteristicUuid = getUUID(obj.optString("characteristic", null));
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(characteristicUuid);
-        if (characteristic == null) {
-            JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "characteristic");
-            addProperty(returnObj, "message", "Characteristic not found");
-            callbackContext.error(returnObj);
-            return;
-        }
-
-        byte[] value = getPropertyBytes(obj, "value");
-        boolean setResult = characteristic.setValue(value);
-        if (!setResult) {
-            JSONObject returnObj = new JSONObject();
-            addProperty(returnObj, "error", "respond");
-            addProperty(returnObj, "message", "Failed to set value");
-            callbackContext.error(returnObj);
-            return;
-        }
-
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(clientConfigurationDescriptorUuid);
-        byte[] descriptorValue = descriptor.getValue();
-
-        boolean isIndicate = false;
-        if (Arrays.equals(descriptorValue, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)) {
-            isIndicate = true;
-        }
-
-        //Wait for onNotificationSent event
-        boolean result = gattServer.notifyCharacteristicChanged(device, characteristic, isIndicate);
-        JSONObject returnObj = new JSONObject();
-        addProperty(returnObj, "status", "notify");
-        if (!result) {
-            addProperty(returnObj, "sent", false);
-        } else {
-            addProperty(returnObj, "sent", true);
-        }
-        callbackContext.success(returnObj);
     }
 
     private void bondAction(JSONArray args, CallbackContext callbackContext) {
