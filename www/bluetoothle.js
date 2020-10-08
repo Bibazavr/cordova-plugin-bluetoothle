@@ -3,6 +3,12 @@ var bluetoothle = {
     getConnectedDevices: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, bluetoothleName, "getConnectedDevices", []);
     },
+    pause: function (){
+        cordova.exec(() =>{}, () =>{}, bluetoothleName, "pause", []);
+    },
+    resume: function (){
+        cordova.exec(() =>{}, () =>{}, bluetoothleName, "resume", []);
+    },
     initialize: function (successCallback, errorCallback, params) {
         cordova.exec(successCallback, errorCallback, bluetoothleName, "initialize", [params]);
     },

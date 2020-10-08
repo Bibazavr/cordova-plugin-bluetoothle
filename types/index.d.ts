@@ -23,6 +23,8 @@ declare namespace BluetoothlePlugin {
     }
 
     interface Bluetoothle {
+        pause(): void
+        resume(): void
         /**
          * Initialize Bluetooth on the device
          * @param initializeResult  The callback that is passed initialize status (enabled/disabled)

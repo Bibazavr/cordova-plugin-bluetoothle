@@ -28,4 +28,6 @@ public class Actions {
 
 
     static final String stringBluetoothOnAction= "com.microline.bluetoothle.ON";
+    static final String stringBluetoothResumeAction= "com.microline.bluetoothle.RESUME";
+    static final String stringBluetoothPauseAction= "com.microline.bluetoothle.PAUSE";
 }

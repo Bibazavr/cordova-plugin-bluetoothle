@@ -241,10 +241,18 @@ public class Background extends Service {
                     Log.e("BIBA", "StartAdvertisingAction");
                     startAdvertisingAction(params_advertising, isAutoStart);
                     break;
+
+                case stringBluetoothResumeAction:
+                    Log.e("BIBA", "ResumeAction");
+                    resume();
+                case stringBluetoothPauseAction:
+                    Log.e("BIBA", "PauseAction");
+                    pause();
             }
         }
         return START_STICKY;
     }
+
 
     @Override
     public void onDestroy() {
@@ -328,6 +336,51 @@ public class Background extends Service {
             addProperty(returnObj, "message", logOperationUnsupported);
 
             callbackContextInitializeAction[0].error(returnObj);
+        }
+    }
+
+
+    private void pause() {
+        isAdvertising = false;
+        if (gattServer != null) {
+            gattServer.clearServices();
+            gattServer.close();
+            Log.e("BIBA", "pause close");
+
+        } else {
+            Log.e("BIBA", "pause, GATT==NULL");
+        }
+    }
+
+    private void resume() {
+        BluetoothManager bluetoothManager = (BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE);
+
+        if (bluetoothAdapter == null) {
+            //Get Bluetooth adapter via Bluetooth Manager
+            assert bluetoothManager != null;
+            bluetoothAdapter = bluetoothManager.getAdapter();
+        }
+
+        //If it's already enabled,
+        if (bluetoothAdapter.isEnabled()) {
+            Log.e("BIBA", "resume, openGattServer");
+            //Re-opening Gatt server seems to cause some issues
+            gattServer = bluetoothManager.openGattServer(this.getApplicationContext(), bluetoothGattServerCallback);
+
+            Log.e("BIBA", "resume AddServiceAction");
+            addServiceAction(service, isAutoStart);
+
+            Log.e("BIBA", "resume StartAdvertisingAction");
+            startAdvertisingAction(params_advertising, isAutoStart);
+            return;
+        }
+        boolean request = true;
+        //Request user to enable Bluetooth надо сделать невидимое активити и там сделать реквест
+        if (request) {
+            //Request Bluetooth to be enabled
+            Intent dialogIntent = new Intent(this, EnableBluetoothActivity.class);
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(dialogIntent);
         }
     }
 

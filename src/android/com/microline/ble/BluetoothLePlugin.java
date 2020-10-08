@@ -55,10 +55,38 @@ public class BluetoothLePlugin extends CordovaPlugin {
             respondAction(args, callbackContext);
         } else if ("notify".equals(action)) {
             notifyAction(args, callbackContext);
+        } else if ("pause".equals(action)) {
+            pause();
+        }else if ("resume".equals(action)){
+            resume();
         } else {
             return false;
         }
         return true;
+    }
+
+    private void pause(){
+        Context context = cordova.getActivity().getApplicationContext();
+        Intent intent = new Intent(context, Background.class);
+        intent.setAction(stringBluetoothPauseAction);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    private void resume(){
+        Context context = cordova.getActivity().getApplicationContext();
+        Intent intent = new Intent(context, Background.class);
+        intent.setAction(stringBluetoothResumeAction);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 
     static CallbackContext callbackContextGetConnectedDevices;
@@ -77,7 +105,6 @@ public class BluetoothLePlugin extends CordovaPlugin {
         }
     }
 
-    ;
 
     static CallbackContext callbackContextInitializeAction;
     static JSONArray argsInitializeAction;
