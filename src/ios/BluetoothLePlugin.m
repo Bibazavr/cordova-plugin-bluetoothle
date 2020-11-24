@@ -143,7 +143,7 @@ NSString *const operationWrite = @"write";
 @implementation BluetoothLePlugin
 
 //Peripheral Manager Functions
-- (void)initializePeripheral:(CDVInvokedUrlCommand *)command {
+- (void)initialize:(CDVInvokedUrlCommand *)command {
   initPeripheralCallback = command.callbackId;
 
   requestId = 0;
@@ -664,62 +664,6 @@ NSString *const operationWrite = @"write";
 
 - (void)peripheralManager:(CBPeripheralManager *)peripheral willRestoreState:(NSDictionary *)dict {
 
-}
-
-//Actions
-- (void)initialize:(CDVInvokedUrlCommand *)command {
-  //Save the callback
-  initCallback = command.callbackId;
-
-  //If central manager has been initialized already, return status=>enabled or status=>disabled success
-  if (centralManager != nil) {
-    NSDictionary* returnObj = nil;
-    CDVPluginResult* pluginResult = nil;
-    if ([centralManager state] == CBCentralManagerStatePoweredOn)
-    {
-
-        returnObj = [NSDictionary dictionaryWithObjectsAndKeys: statusEnabled, keyStatus, nil];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnObj];
-    }
-    else
-    {
-        returnObj = [NSDictionary dictionaryWithObjectsAndKeys: statusDisabled, keyStatus, nil];
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:returnObj];
-    }
-
-    [pluginResult setKeepCallbackAsBool:true];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:initCallback];
-
-    return;
-  }
-
-  //By default, dont request the user to enable Bluetooth
-  NSNumber* request = [NSNumber numberWithBool:NO];
-
-  //Check arguments to see if default value is overwritten
-  NSDictionary* obj = [self getArgsObject:command.arguments];
-  if (obj != nil) {
-    request = [self getRequest:obj];
-  }
-
-  //Check if status should be returned
-  statusReceiver = [self getStatusReceiver:obj];
-
-  NSNumber* restoreKey = [obj valueForKey:@"restoreKey"];
-
-  NSMutableDictionary* options = [NSMutableDictionary dictionary];
-  if (restoreKey) {
-    [options setValue:restoreKey forKey:CBCentralManagerOptionRestoreIdentifierKey];
-  }
-  if (request) {
-    [options setValue:request forKey:CBCentralManagerOptionShowPowerAlertKey];
-  }
-
-  //Initialize central manager
-  centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:options];
-
-  //Create dictionary to hold connections and all their callbacks
-  connections = [NSMutableDictionary dictionary];
 }
 
 - (void)enable:(CDVInvokedUrlCommand *)command {
